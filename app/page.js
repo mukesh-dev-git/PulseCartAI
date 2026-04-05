@@ -11,21 +11,21 @@ import {
 
 /* ─── Constants ─────────────────────────── */
 const CATEGORIES = [
-  { id: "All",        label: "All",          Icon: ShoppingBagIcon },
-  { id: "Headphones", label: "Headphones",   Icon: HeadphonesIcon  },
-  { id: "Smartwatch", label: "Smartwatches", Icon: WatchIcon       },
-  { id: "Laptop",     label: "Laptops",      Icon: LaptopIcon      },
-  { id: "Camera",     label: "Cameras",      Icon: CameraIcon      },
-  { id: "Earbuds",    label: "Earbuds",      Icon: EarbudsIcon     },
-  { id: "Keyboard",   label: "Keyboards",    Icon: KeyboardIcon    },
+  { id: "All", label: "All", Icon: ShoppingBagIcon },
+  { id: "Headphones", label: "Headphones", Icon: HeadphonesIcon },
+  { id: "Smartwatch", label: "Smartwatches", Icon: WatchIcon },
+  { id: "Laptop", label: "Laptops", Icon: LaptopIcon },
+  { id: "Camera", label: "Cameras", Icon: CameraIcon },
+  { id: "Earbuds", label: "Earbuds", Icon: EarbudsIcon },
+  { id: "Keyboard", label: "Keyboards", Icon: KeyboardIcon },
 ];
 
 const BADGE_CLASS = {
-  "Best Seller":     "bestseller",
-  "Top Rated":       "top",
-  "New Arrival":     "new",
-  "Pro Pick":        "top",
-  "Fan Favourite":   "bestseller",
+  "Best Seller": "bestseller",
+  "Top Rated": "top",
+  "New Arrival": "new",
+  "Pro Pick": "top",
+  "Fan Favourite": "bestseller",
   "Editor's Choice": "top",
 };
 
@@ -206,11 +206,11 @@ function AdBanner({ src, alt = "Advertisement", id }) {
 /* ─── Main Page ─────────────────────────── */
 export default function Home() {
   const [activeCategory, setActiveCategory] = useState("All");
-  const [cart,     setCart]     = useState([]);
+  const [cart, setCart] = useState([]);
   const [wishlist, setWishlist] = useState([]);
   const [cartOpen, setCartOpen] = useState(false);
-  const [search,   setSearch]   = useState("");
-  const [toast,    setToast]    = useState({ show: false, msg: "" });
+  const [search, setSearch] = useState("");
+  const [toast, setToast] = useState({ show: false, msg: "" });
 
   const showToast = useCallback((msg) => {
     setToast({ show: true, msg });
@@ -230,11 +230,11 @@ export default function Home() {
   const handleQty = useCallback((id, delta) => {
     setCart((prev) =>
       prev.map((i) => i.id === id ? { ...i, qty: Math.max(0, i.qty + delta) } : i)
-          .filter((i) => i.qty > 0)
+        .filter((i) => i.qty > 0)
     );
   }, []);
 
-  const handleRemove  = useCallback((id) => setCart((p) => p.filter((i) => i.id !== id)), []);
+  const handleRemove = useCallback((id) => setCart((p) => p.filter((i) => i.id !== id)), []);
   const handleWish = useCallback((id) => {
     setWishlist((prev) => {
       const has = prev.includes(id);
@@ -247,7 +247,7 @@ export default function Home() {
   const wishCount = wishlist.length;
 
   const filtered = products.filter((p) => {
-    const matchCat    = activeCategory === "All" || p.category === activeCategory;
+    const matchCat = activeCategory === "All" || p.category === activeCategory;
     const matchSearch = !search || p.name.toLowerCase().includes(search.toLowerCase());
     return matchCat && matchSearch;
   });
@@ -336,8 +336,16 @@ export default function Home() {
 
         {/* Advertisement banners */}
         <section className="ad-row" aria-label="Promotions">
-          <AdBanner id="banner1" alt="Featured deal banner" />
-          <AdBanner id="banner2" alt="Special offer banner" />
+          <AdBanner
+            id="banner1"
+            alt="Featured deal banner"
+            src="https://images.unsplash.com/photo-1607083206968-13611e3d76db?auto=format&fit=crop&w=1400&h=430&q=80"
+          />
+          <AdBanner
+            id="banner2"
+            alt="Special offer banner"
+            src="https://images.unsplash.com/photo-1607082348824-0a96f2a4b9da?auto=format&fit=crop&w=1400&h=430&q=80"
+          />
         </section>
 
         {/* Products */}
