@@ -152,16 +152,6 @@ export function CameraIcon({ size = 20 }) {
   );
 }
 
-export function EarbudsIcon({ size = 20 }) {
-  return (
-    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-      <path d="M9 18a4 4 0 0 1-8 0V9a9 9 0 0 1 18 0" />
-      <circle cx="17" cy="18" r="3" />
-      <path d="M17 15v-2a5 5 0 0 0-5-5" />
-    </svg>
-  );
-}
-
 export function KeyboardIcon({ size = 20 }) {
   return (
     <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -180,7 +170,6 @@ export function ProductPlaceholder({ category }) {
     Smartwatch: WatchIcon,
     Laptop: LaptopIcon,
     Camera: CameraIcon,
-    Earbuds: EarbudsIcon,
     Keyboard: KeyboardIcon,
   };
   const Icon = iconMap[category] || ShoppingBagIcon;

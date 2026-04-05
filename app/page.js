@@ -5,7 +5,7 @@ import {
   PulseCartLogo, SearchIcon, CartIcon, UserIcon,
   HeartIcon, StarIcon, PlusIcon, MinusIcon, CloseIcon,
   ChevronRightIcon, ImageIcon, ShoppingBagIcon,
-  HeadphonesIcon, WatchIcon, LaptopIcon, CameraIcon, EarbudsIcon, KeyboardIcon,
+  HeadphonesIcon, WatchIcon, LaptopIcon, CameraIcon, KeyboardIcon,
   ProductPlaceholder,
 } from "./components/Icons";
 
@@ -16,7 +16,6 @@ const CATEGORIES = [
   { id: "Smartwatch", label: "Smartwatches", Icon: WatchIcon },
   { id: "Laptop", label: "Laptops", Icon: LaptopIcon },
   { id: "Camera", label: "Cameras", Icon: CameraIcon },
-  { id: "Earbuds", label: "Earbuds", Icon: EarbudsIcon },
   { id: "Keyboard", label: "Keyboards", Icon: KeyboardIcon },
 ];
 
