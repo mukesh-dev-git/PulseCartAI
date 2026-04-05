@@ -185,6 +185,61 @@ function CartDrawer({ open, onClose, cart, onQty, onRemove }) {
   );
 }
 
+/* ─── Wishlist Drawer ───────────────────── */
+function WishlistDrawer({ open, onClose, wishlistIds, allProducts, onAddToCart, onRemove }) {
+  const wishedItems = allProducts.filter((p) => wishlistIds.includes(p.id));
+
+  return (
+    <>
+      <div className={`overlay${open ? " open" : ""}`} onClick={onClose} aria-hidden="true" />
+      <aside className={`cart-drawer${open ? " open" : ""}`} aria-label="Your wishlist">
+        <div className="d-hd">
+          <h3>Wishlist&nbsp;({wishlistIds.length})</h3>
+          <button className="d-close" onClick={onClose} aria-label="Close wishlist">
+            <CloseIcon size={14} />
+          </button>
+        </div>
+        <div className="d-body">
+          {wishedItems.length === 0 ? (
+            <div className="d-empty">
+              <HeartIcon size={38} />
+              <p>Your wishlist is empty.<br />Save items you love here.</p>
+            </div>
+          ) : (
+            wishedItems.map((item) => (
+              <div key={item.id} className="c-item">
+                <div className="c-img">
+                  {item.image
+                    ? <img src={item.image} alt={item.name} />
+                    : <ProductPlaceholder category={item.category} />
+                  }
+                </div>
+                <div className="c-info">
+                  <p className="c-name" style={{ WebkitLineClamp: 2 }}>{item.name}</p>
+                  <p className="c-price">{formatINR(item.price)}</p>
+                  <button
+                    className="btn-primary"
+                    style={{ marginTop: '8px', padding: '6px 12px', fontSize: '0.8rem', width: 'auto' }}
+                    onClick={() => {
+                      onAddToCart(item);
+                      onRemove(item.id);
+                    }}
+                  >
+                    Move to Cart
+                  </button>
+                </div>
+                <button className="c-rm-btn c-rm" onClick={() => onRemove(item.id)} aria-label={`Remove ${item.name}`}>
+                  <CloseIcon size={12} />
+                </button>
+              </div>
+            ))
+          )}
+        </div>
+      </aside>
+    </>
+  );
+}
+
 /* ─── Ad Banner ─────────────────────────── */
 function AdBanner({ src, alt = "Advertisement", id }) {
   return (
@@ -208,6 +263,7 @@ export default function Home() {
   const [cart, setCart] = useState([]);
   const [wishlist, setWishlist] = useState([]);
   const [cartOpen, setCartOpen] = useState(false);
+  const [wishOpen, setWishOpen] = useState(false);
   const [search, setSearch] = useState("");
   const [toast, setToast] = useState({ show: false, msg: "" });
 
@@ -289,6 +345,7 @@ export default function Home() {
               className="nav-btn"
               id="btn-wishlist-nav"
               aria-label={`Wishlist (${wishCount})`}
+              onClick={() => { setCartOpen(false); setWishOpen(true); }}
               style={{ position: "relative" }}
             >
               <HeartIcon size={22} />
@@ -300,7 +357,7 @@ export default function Home() {
               className="nav-btn"
               id="btn-cart-nav"
               aria-label={`Cart, ${cartCount} items`}
-              onClick={() => setCartOpen(true)}
+              onClick={() => { setWishOpen(false); setCartOpen(true); }}
               style={{ position: "relative" }}
             >
               <CartIcon size={23} />
@@ -387,6 +444,16 @@ export default function Home() {
         cart={cart}
         onQty={handleQty}
         onRemove={handleRemove}
+      />
+
+      {/* ── Wishlist Drawer ── */}
+      <WishlistDrawer
+        open={wishOpen}
+        onClose={() => setWishOpen(false)}
+        wishlistIds={wishlist}
+        allProducts={products}
+        onAddToCart={handleAdd}
+        onRemove={handleWish}
       />
 
       {/* ── Toast notification ── */}
