@@ -972,20 +972,49 @@ button {
 }
 
 @media (max-width: 640px) {
+  :root {
+    --nav-h: 114px;
+  }
+  .navbar {
+    padding: 10px 14px;
+    align-items: flex-start;
+  }
+  .navbar-inner {
+    flex-wrap: wrap;
+    justify-content: space-between;
+    gap: 10px 0;
+  }
+  .logo {
+    order: 1;
+    transform: scale(0.85);
+    transform-origin: left center;
+  }
+  .nav-actions {
+    order: 2;
+    margin-left: auto;
+    gap: 4px;
+  }
+  .search-wrap {
+    order: 3;
+    flex: 1 1 100%;
+    max-width: 100%;
+    margin-top: 2px;
+  }
+  .search-bar {
+    height: 44px;
+    border-radius: 8px;
+  }
+  .nav-label {
+    display: none;
+  }
+  .nav-btn {
+    padding: 6px;
+  }
   .p-grid {
     grid-template-columns: repeat(auto-fill, minmax(145px, 1fr));
     gap: 10px;
   }
-
   .cart-drawer {
     width: 100vw;
-  }
-
-  .nav-label {
-    display: none;
-  }
-
-  .navbar-inner {
-    gap: 12px;
   }
 }
