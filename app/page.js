@@ -9,6 +9,8 @@ import {
   ProductPlaceholder,
 } from "./components/Icons";
 import AIChatWidget from "./components/AIChatWidget";
+import NudgeEngine from "./components/NudgeEngine";
+import NudgeToast from "./components/NudgeToast";
 
 /* ─── Constants ─────────────────────────── */
 const CATEGORIES = [
@@ -267,6 +269,12 @@ export default function Home() {
   const [wishOpen, setWishOpen] = useState(false);
   const [search, setSearch] = useState("");
   const [toast, setToast] = useState({ show: false, msg: "" });
+  const [nudge, setNudge] = useState(null);
+
+  const handleNudge = useCallback((n) => {
+    setNudge(null); // reset first so same nudge type can re-fire visually
+    setTimeout(() => setNudge(n), 50);
+  }, []);
 
   const showToast = useCallback((msg) => {
     setToast({ show: true, msg });
@@ -479,6 +487,15 @@ export default function Home() {
         <span className="t-dot" aria-hidden="true" />
         {toast.msg}
       </div>
+
+      <NudgeEngine
+        cart={cart}
+        wishlist={wishlist}
+        allProducts={products}
+        onNudge={handleNudge}
+      />
+
+      <NudgeToast nudge={nudge} onDismiss={() => setNudge(null)} />
 
       <AIChatWidget renderProduct={handleRenderProduct} />
 
