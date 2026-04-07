@@ -35,14 +35,6 @@ export default function RootLayout({ children }) {
       lang="en"
       className={`${sairaStencil.variable} ${montserrat.variable} ${nunito.variable}`}
     >
-      <body>{children}</body>
-    </html>
-  );
-}
-
-export default function RootLayout({ children }) {
-  return (
-    <html lang="en">
       <body>
         {children}
         <Analytics />
