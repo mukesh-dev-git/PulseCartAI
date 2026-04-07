@@ -28,7 +28,7 @@ const BADGE_CLASS = {
   "Editor's Choice": "top",
 };
 
-const formatINR = (n) => "₹" + n.toLocaleString("en-IN");
+const formatMYR = (n) => "RM" + n.toLocaleString("en-MY");
 
 /* ─── Product Card ── Zepto-style compact ─ */
 function ProductCard({ product, cartQty, onAdd, onQty, wishlist, onWish }) {
@@ -95,8 +95,8 @@ function ProductCard({ product, cartQty, onAdd, onQty, wishlist, onWish }) {
       {/* ── Card body — floats below the image box ── */}
       <div className="p-body">
         <div className="p-price-row">
-          <span className="p-price">{formatINR(product.price)}</span>
-          <span className="p-mrp">{formatINR(product.originalPrice)}</span>
+          <span className="p-price">{formatMYR(product.price)}</span>
+          <span className="p-mrp">{formatMYR(product.originalPrice)}</span>
           <span className="p-off">{product.discount}% off</span>
         </div>
         <p className="p-name">{product.name}</p>
@@ -118,7 +118,7 @@ function ProductCard({ product, cartQty, onAdd, onQty, wishlist, onWish }) {
 /* ─── Cart Drawer ───────────────────────── */
 function CartDrawer({ open, onClose, cart, onQty, onRemove }) {
   const subtotal = cart.reduce((s, i) => s + i.price * i.qty, 0);
-  const shipping = subtotal > 0 && subtotal < 5000 ? 199 : 0;
+  const shipping = subtotal > 0 && subtotal < 265 ? 10 : 0;
 
   return (
     <>
@@ -149,7 +149,7 @@ function CartDrawer({ open, onClose, cart, onQty, onRemove }) {
                 </div>
                 <div className="c-info">
                   <p className="c-name">{item.name}</p>
-                  <p className="c-price">{formatINR(item.price)}</p>
+                  <p className="c-price">{formatMYR(item.price)}</p>
                   <div className="c-qty">
                     <button className="cq-btn" onClick={() => onQty(item.id, -1)} aria-label="Decrease"><MinusIcon size={11} /></button>
                     <span className="cq-val">{item.qty}</span>
@@ -166,14 +166,14 @@ function CartDrawer({ open, onClose, cart, onQty, onRemove }) {
 
         {cart.length > 0 && (
           <div className="d-ft">
-            <div className="d-row"><span>Subtotal</span><span>{formatINR(subtotal)}</span></div>
+            <div className="d-row"><span>Subtotal</span><span>{formatMYR(subtotal)}</span></div>
             <div className="d-row">
               <span>Delivery</span>
-              <span>{shipping === 0 ? "Free" : formatINR(shipping)}</span>
+              <span>{shipping === 0 ? "Free" : formatMYR(shipping)}</span>
             </div>
             <div className="d-row total">
               <span>Total</span>
-              <span>{formatINR(subtotal + shipping)}</span>
+              <span>{formatMYR(subtotal + shipping)}</span>
             </div>
             <button className="d-checkout" id="btn-checkout">
               Proceed to Checkout
@@ -216,7 +216,7 @@ function WishlistDrawer({ open, onClose, wishlistIds, allProducts, onAddToCart, 
                 </div>
                 <div className="c-info">
                   <p className="c-name" style={{ WebkitLineClamp: 2 }}>{item.name}</p>
-                  <p className="c-price">{formatINR(item.price)}</p>
+                  <p className="c-price">{formatMYR(item.price)}</p>
                   <button
                     className="btn-primary"
                     style={{ marginTop: '8px', padding: '6px 12px', fontSize: '0.8rem', width: 'auto' }}
