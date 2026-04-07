@@ -1,5 +1,6 @@
 import { Saira_Stencil_One, Montserrat, Nunito } from "next/font/google";
 import "./globals.css";
+import { Analytics } from "@vercel/analytics/next";
 
 const sairaStencil = Saira_Stencil_One({
   weight: "400",
@@ -35,6 +36,17 @@ export default function RootLayout({ children }) {
       className={`${sairaStencil.variable} ${montserrat.variable} ${nunito.variable}`}
     >
       <body>{children}</body>
+    </html>
+  );
+}
+
+export default function RootLayout({ children }) {
+  return (
+    <html lang="en">
+      <body>
+        {children}
+        <Analytics />
+      </body>
     </html>
   );
 }
