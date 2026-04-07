@@ -8,6 +8,7 @@ import {
   HeadphonesIcon, WatchIcon, LaptopIcon, CameraIcon, KeyboardIcon,
   ProductPlaceholder,
 } from "./components/Icons";
+import AIChatWidget from "./components/AIChatWidget";
 
 /* ─── Constants ─────────────────────────── */
 const CATEGORIES = [
@@ -307,6 +308,23 @@ export default function Home() {
     return matchCat && matchSearch;
   });
 
+  const handleRenderProduct = useCallback((id) => {
+    const p = products.find(prod => prod.id === parseInt(id));
+    if (!p) return null;
+    return (
+      <div style={{ padding: '12px 0 4px', width: '100%' }} key={`chat-prod-${p.id}`}>
+        <ProductCard
+          product={p}
+          cartQty={cart.find((i) => i.id === p.id)?.qty || 0}
+          onAdd={handleAdd}
+          onQty={handleQty}
+          wishlist={wishlist}
+          onWish={handleWish}
+        />
+      </div>
+    );
+  }, [cart, wishlist, handleAdd, handleQty, handleWish]);
+
   return (
     <>
       {/* ── Navbar ── */}
@@ -461,6 +479,8 @@ export default function Home() {
         <span className="t-dot" aria-hidden="true" />
         {toast.msg}
       </div>
+
+      <AIChatWidget renderProduct={handleRenderProduct} />
 
       {/* ── Footer ── */}
       <footer className="footer">
