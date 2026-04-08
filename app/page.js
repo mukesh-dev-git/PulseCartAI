@@ -6,7 +6,7 @@ import {
   HeartIcon, StarIcon, PlusIcon, MinusIcon, CloseIcon,
   ChevronRightIcon, ImageIcon, ShoppingBagIcon,
   HeadphonesIcon, WatchIcon, LaptopIcon, CameraIcon, KeyboardIcon,
-  ProductPlaceholder,
+  ProductPlaceholder, SparklesIcon,
 } from "./components/Icons";
 import AIChatWidget from "./components/AIChatWidget";
 import NudgeEngine from "./components/NudgeEngine";
@@ -34,7 +34,7 @@ const BADGE_CLASS = {
 const formatMYR = (n) => "RM" + n.toLocaleString("en-MY");
 
 /* ─── Product Card ── Zepto-style compact ─ */
-function ProductCard({ product, cartQty, onAdd, onQty, wishlist, onWish }) {
+function ProductCard({ product, cartQty, onAdd, onQty, wishlist, onWish, aiReason }) {
   const inCart = cartQty > 0;
   const wished = wishlist.includes(product.id);
 
@@ -113,6 +113,12 @@ function ProductCard({ product, cartQty, onAdd, onQty, wishlist, onWish }) {
           </div>
           <span className="r-count">({product.reviews?.toLocaleString()})</span>
         </div>
+        {aiReason && (
+          <div className="ai-reason">
+            <SparklesIcon size={11} />
+            <span>{aiReason}</span>
+          </div>
+        )}
       </div>
     </article>
   );
@@ -271,9 +277,32 @@ export default function Home() {
   const [toast, setToast] = useState({ show: false, msg: "" });
   const [nudge, setNudge] = useState(null);
   const [chatPrompt, setChatPrompt] = useState(null);
+  const [aiSearch, setAiSearch] = useState({ active: false, loading: false, query: "", summary: "", results: [] });
 
   const handleAskAI = useCallback((productName) => {
     setChatPrompt(`Tell me about ${productName}. Is it worth buying? What are its pros and cons?`);
+  }, []);
+
+  const handleAISearch = useCallback(async (query) => {
+    if (!query.trim()) return;
+    setAiSearch(prev => ({ ...prev, loading: true, active: true, query }));
+    try {
+      const res = await fetch("/api/search", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ query }),
+      });
+      const data = await res.json();
+      setAiSearch({ active: true, loading: false, query, summary: data.summary, results: data.results || [] });
+    } catch {
+      setAiSearch(prev => ({ ...prev, loading: false, summary: "Something went wrong. Try again." }));
+    }
+  }, []);
+
+  const clearAISearch = useCallback(() => {
+    setAiSearch({ active: false, loading: false, query: "", summary: "", results: [] });
+    setSearch("");
+    setActiveCategory("All");
   }, []);
 
   const handleNudge = useCallback((n) => {
@@ -315,11 +344,20 @@ export default function Home() {
   const cartCount = cart.reduce((s, i) => s + i.qty, 0);
   const wishCount = wishlist.length;
 
-  const filtered = products.filter((p) => {
-    const matchCat = activeCategory === "All" || p.category === activeCategory;
-    const matchSearch = !search || p.name.toLowerCase().includes(search.toLowerCase());
-    return matchCat && matchSearch;
-  });
+  const aiReasonMap = {};
+  if (aiSearch.active && !aiSearch.loading) {
+    aiSearch.results.forEach(r => { aiReasonMap[r.id] = r.reason; });
+  }
+
+  const filtered = aiSearch.active && !aiSearch.loading
+    ? aiSearch.results
+        .map(r => products.find(p => p.id === r.id))
+        .filter(Boolean)
+    : products.filter((p) => {
+        const matchCat = activeCategory === "All" || p.category === activeCategory;
+        const matchSearch = !search || p.name.toLowerCase().includes(search.toLowerCase());
+        return matchCat && matchSearch;
+      });
 
   const handleRenderProduct = useCallback((id) => {
     const p = products.find(prod => prod.id === parseInt(id));
@@ -352,16 +390,38 @@ export default function Home() {
 
           {/* Search */}
           <div className="search-wrap" role="search">
-            <div className="search-bar">
+            <div className={`search-bar${aiSearch.active ? " ai-active" : ""}`}>
               <span className="s-icon" aria-hidden="true"><SearchIcon size={19} /></span>
               <input
                 id="search-input"
                 type="search"
-                placeholder="Search products, brands…"
+                placeholder="Try &quot;best laptop for coding&quot; or &quot;gift under RM200&quot;…"
                 value={search}
-                onChange={(e) => setSearch(e.target.value)}
-                aria-label="Search products"
+                onChange={(e) => {
+                  setSearch(e.target.value);
+                  if (aiSearch.active) clearAISearch();
+                }}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter" && search.trim()) {
+                    e.preventDefault();
+                    handleAISearch(search.trim());
+                  }
+                }}
+                aria-label="Search products — press Enter for AI search"
               />
+              {search.trim() && !aiSearch.loading && (
+                <button
+                  className="ai-search-btn"
+                  onClick={() => handleAISearch(search.trim())}
+                  aria-label="AI Search"
+                  title="AI Search"
+                >
+                  <SparklesIcon size={16} />
+                </button>
+              )}
+              {aiSearch.loading && (
+                <span className="ai-search-spinner" aria-label="Searching..." />
+              )}
             </div>
           </div>
 
@@ -437,34 +497,61 @@ export default function Home() {
 
         {/* Products */}
         <section aria-label="Product listing">
-          <div className="sec-hd">
-            <h2 className="sec-title">
-              {activeCategory === "All" ? "Featured Products" : activeCategory}
-              {search && ` · "${search}"`}
-            </h2>
-            <button className="see-all" id="btn-see-all">
-              See All <ChevronRightIcon size={12} />
-            </button>
-          </div>
-
-          <div className="p-grid" role="list" aria-label="Products">
-            {filtered.length === 0 ? (
-              <p className="p-empty">No products found for this selection.</p>
-            ) : (
-              filtered.map((p) => (
-                <div key={p.id} role="listitem">
-                  <ProductCard
-                    product={p}
-                    cartQty={cart.find((i) => i.id === p.id)?.qty || 0}
-                    onAdd={handleAdd}
-                    onQty={handleQty}
-                    wishlist={wishlist}
-                    onWish={handleWish}
-                  />
+          {aiSearch.active && !aiSearch.loading ? (
+            <div className="ai-banner">
+              <div className="ai-banner-left">
+                <SparklesIcon size={18} />
+                <div>
+                  <p className="ai-banner-title">AI Search: &ldquo;{aiSearch.query}&rdquo;</p>
+                  <p className="ai-banner-summary">{aiSearch.summary}</p>
                 </div>
-              ))
-            )}
-          </div>
+              </div>
+              <button className="ai-banner-clear" onClick={clearAISearch}>
+                <CloseIcon size={12} /> Clear
+              </button>
+            </div>
+          ) : aiSearch.loading ? (
+            <div className="ai-banner ai-banner-loading">
+              <span className="ai-search-spinner" />
+              <p className="ai-banner-title">AI is searching for &ldquo;{aiSearch.query}&rdquo;...</p>
+            </div>
+          ) : (
+            <div className="sec-hd">
+              <h2 className="sec-title">
+                {activeCategory === "All" ? "Featured Products" : activeCategory}
+                {search && ` · "${search}"`}
+              </h2>
+              <button className="see-all" id="btn-see-all">
+                See All <ChevronRightIcon size={12} />
+              </button>
+            </div>
+          )}
+
+          {!aiSearch.loading && (
+            <div className="p-grid" role="list" aria-label="Products">
+              {filtered.length === 0 ? (
+                <p className="p-empty">
+                  {aiSearch.active
+                    ? "AI couldn't find matching products. Try a different query."
+                    : "No products found for this selection."}
+                </p>
+              ) : (
+                filtered.map((p) => (
+                  <div key={p.id} role="listitem">
+                    <ProductCard
+                      product={p}
+                      cartQty={cart.find((i) => i.id === p.id)?.qty || 0}
+                      onAdd={handleAdd}
+                      onQty={handleQty}
+                      wishlist={wishlist}
+                      onWish={handleWish}
+                      aiReason={aiReasonMap[p.id]}
+                    />
+                  </div>
+                ))
+              )}
+            </div>
+          )}
         </section>
       </main>
 

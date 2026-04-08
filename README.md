@@ -24,6 +24,13 @@ PulseCart AI is a smart e-commerce prototype that demonstrates how AI can enhanc
 - Save favourite products to a dedicated wishlist drawer
 - Quick "Move to Cart" action from wishlist
 
+### AI Smart Search
+- Type a natural language query and press **Enter** (or click the sparkle button) to trigger AI-powered search
+- Understands intent — queries like *"best laptop for coding"*, *"gift under RM200"*, or *"wireless headphones for gym"* all work
+- Returns ranked results with a per-product **AI reason chip** explaining why each product matches
+- Results banner shows a summary of what the AI found, with a clear button to reset
+- Falls back to instant text filtering while typing (AI triggers only on Enter)
+
 ### AI Shopping Assistant
 - Floating chat widget powered by **LLaMA 3.1** (via Groq)
 - Streaming responses for real-time conversation feel
@@ -62,7 +69,8 @@ PulseCartAI/
 │   ├── page.js                      # Main storefront page
 │   ├── globals.css                  # Global styles
 │   ├── api/
-│   │   └── chat/route.js            # POST /api/chat — Groq streaming endpoint
+│   │   ├── chat/route.js            # POST /api/chat — Groq streaming endpoint
+│   │   └── search/route.js          # POST /api/search — AI smart search endpoint
 │   └── components/
 │       ├── AIChatWidget.js          # Floating AI chat panel
 │       ├── AIChatWidget.module.css
@@ -108,6 +116,7 @@ Open [http://localhost:3000](http://localhost:3000) to see the app.
 | Method | Endpoint | Description |
 |---|---|---|
 | POST | `/api/chat` | Sends conversation to Groq LLaMA 3.1 and streams the response back |
+| POST | `/api/search` | AI-powered product search — returns ranked product IDs with match reasons |
 
 ---
 

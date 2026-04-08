@@ -287,6 +287,136 @@ button {
   justify-content: center;
 }
 
+/* ─── AI Search Button in Search Bar ───── */
+.ai-search-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 34px;
+  border-radius: 8px;
+  border: none;
+  background: linear-gradient(135deg, var(--orange), #ff6a00);
+  color: #fff;
+  flex-shrink: 0;
+  cursor: pointer;
+  transition: var(--tr);
+}
+
+.ai-search-btn:hover {
+  transform: scale(1.08);
+  box-shadow: 0 2px 10px rgba(212, 72, 10, 0.35);
+}
+
+.search-bar.ai-active {
+  border-color: var(--orange);
+  box-shadow: 0 0 0 3px rgba(212, 72, 10, 0.12);
+}
+
+.ai-search-spinner {
+  width: 20px;
+  height: 20px;
+  border: 2.5px solid var(--border-2);
+  border-top-color: var(--orange);
+  border-radius: 50%;
+  animation: spin 0.7s linear infinite;
+  flex-shrink: 0;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+/* ─── AI Search Banner ───────────────────── */
+.ai-banner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  padding: 14px 18px;
+  margin-bottom: 18px;
+  background: linear-gradient(135deg, #fff8f5 0%, #fff0e8 100%);
+  border: 1.5px solid #f5d0ba;
+  border-radius: var(--r-md);
+}
+
+.ai-banner-loading {
+  justify-content: flex-start;
+}
+
+.ai-banner-left {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  color: var(--orange);
+  min-width: 0;
+}
+
+.ai-banner-title {
+  font-family: var(--f-montserrat);
+  font-size: 0.88rem;
+  font-weight: 800;
+  color: var(--text);
+}
+
+.ai-banner-summary {
+  font-family: var(--f-nunito);
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--text-2);
+  margin-top: 2px;
+}
+
+.ai-banner-clear {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  padding: 6px 14px;
+  border: 1.5px solid var(--border-2);
+  border-radius: var(--r-sm);
+  background: var(--surface);
+  font-family: var(--f-nunito);
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: var(--text-2);
+  cursor: pointer;
+  transition: var(--tr);
+  flex-shrink: 0;
+  white-space: nowrap;
+}
+
+.ai-banner-clear:hover {
+  border-color: var(--orange);
+  color: var(--orange);
+  background: #fff3ed;
+}
+
+/* ─── AI Reason Chip on Product Card ───── */
+.ai-reason {
+  display: flex;
+  align-items: flex-start;
+  gap: 5px;
+  margin-top: 5px;
+  padding: 5px 8px;
+  background: linear-gradient(135deg, #fff8f5, #fff0e8);
+  border: 1px solid #f0d4c2;
+  border-radius: 6px;
+  color: var(--orange-mid);
+}
+
+.ai-reason svg {
+  flex-shrink: 0;
+  margin-top: 1px;
+}
+
+.ai-reason span {
+  font-family: var(--f-nunito);
+  font-size: 0.68rem;
+  font-weight: 700;
+  line-height: 1.35;
+  color: var(--text-2);
+}
+
 /* ─── Page ──────────────────────────────── */
 .page {
   max-width: 1400px;
