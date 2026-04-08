@@ -1,19 +1,19 @@
 "use client";
 import { useEffect, useState } from "react";
+import { SparklesIcon } from "./Icons";
 import styles from "./NudgeToast.module.css";
 
-export default function NudgeToast({ nudge, onDismiss }) {
+export default function NudgeToast({ nudge, onDismiss, onAskAI }) {
   const [visible, setVisible] = useState(false);
 
   useEffect(() => {
     if (!nudge) return;
-    // Animate in
     const showTimer = setTimeout(() => setVisible(true), 50);
-    // Auto-dismiss after 5s
+    const duration = nudge.type === "hesitation" ? 8000 : 5000;
     const hideTimer = setTimeout(() => {
       setVisible(false);
-      setTimeout(onDismiss, 400); // wait for fade-out
-    }, 5000);
+      setTimeout(onDismiss, 400);
+    }, duration);
 
     return () => {
       clearTimeout(showTimer);
@@ -25,6 +25,14 @@ export default function NudgeToast({ nudge, onDismiss }) {
 
   const typeClass = styles[nudge.type] || "";
 
+  const handleAskAI = () => {
+    if (onAskAI && nudge.productName) {
+      onAskAI(nudge.productName);
+    }
+    setVisible(false);
+    setTimeout(onDismiss, 400);
+  };
+
   return (
     <div className={`${styles.nudge} ${typeClass} ${visible ? styles.show : ""}`} role="alert">
       <div className={styles.iconWrap}>
@@ -34,6 +42,12 @@ export default function NudgeToast({ nudge, onDismiss }) {
       <div className={styles.body}>
         <p className={styles.title}>{nudge.title}</p>
         <p className={styles.msg}>{nudge.message}</p>
+        {nudge.type === "hesitation" && (
+          <button className={styles.askAiBtn} onClick={handleAskAI}>
+            <SparklesIcon size={13} />
+            Ask AI about this
+          </button>
+        )}
       </div>
       <button className={styles.dismiss} onClick={() => { setVisible(false); setTimeout(onDismiss, 400); }} aria-label="Dismiss">✕</button>
     </div>

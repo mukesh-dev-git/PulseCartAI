@@ -37,6 +37,7 @@ export default function NudgeEngine({ cart, wishlist, allProducts, onNudge }) {
           icon: <BotIcon size={18} />,
           title: "AI Insight",
           message: `Curious about ${product.name.split(" ").slice(0, 3).join(" ")}? Ask our AI if it fits your needs!`,
+          productName: product.name,
         });
       }, 3000);
     };

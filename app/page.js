@@ -270,6 +270,11 @@ export default function Home() {
   const [search, setSearch] = useState("");
   const [toast, setToast] = useState({ show: false, msg: "" });
   const [nudge, setNudge] = useState(null);
+  const [chatPrompt, setChatPrompt] = useState(null);
+
+  const handleAskAI = useCallback((productName) => {
+    setChatPrompt(`Tell me about ${productName}. Is it worth buying? What are its pros and cons?`);
+  }, []);
 
   const handleNudge = useCallback((n) => {
     setNudge(null); // reset first so same nudge type can re-fire visually
@@ -495,9 +500,13 @@ export default function Home() {
         onNudge={handleNudge}
       />
 
-      <NudgeToast nudge={nudge} onDismiss={() => setNudge(null)} />
+      <NudgeToast nudge={nudge} onDismiss={() => setNudge(null)} onAskAI={handleAskAI} />
 
-      <AIChatWidget renderProduct={handleRenderProduct} />
+      <AIChatWidget
+        renderProduct={handleRenderProduct}
+        externalPrompt={chatPrompt}
+        onExternalPromptHandled={() => setChatPrompt(null)}
+      />
 
       {/* ── Footer ── */}
       <footer className="footer">

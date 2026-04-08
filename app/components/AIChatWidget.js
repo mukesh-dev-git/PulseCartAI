@@ -1,8 +1,8 @@
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, useCallback } from "react";
 import styles from "./AIChatWidget.module.css";
 import { SparklesIcon, CloseIcon, SendIcon } from "./Icons";
 
-export default function AIChatWidget({ renderProduct }) {
+export default function AIChatWidget({ renderProduct, externalPrompt, onExternalPromptHandled }) {
   const [isOpen, setIsOpen] = useState(false);
   const [messages, setMessages] = useState([
     { role: "assistant", content: "Hi! I'm PulseCart AI. Looking for something specific?" }
@@ -10,6 +10,9 @@ export default function AIChatWidget({ renderProduct }) {
   const [input, setInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const messagesEndRef = useRef(null);
+  const messagesRef = useRef(messages);
+  messagesRef.current = messages;
+  const lastHandledPrompt = useRef(null);
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -19,13 +22,10 @@ export default function AIChatWidget({ renderProduct }) {
     scrollToBottom();
   }, [messages, isOpen]);
 
-  const handleSend = async (e) => {
-    e?.preventDefault();
-    if (!input.trim() || isLoading) return;
+  const sendMessage = useCallback(async (text, currentMessages) => {
+    const userMessage = { role: "user", content: text };
+    const updatedMessages = [...currentMessages, userMessage];
 
-    const userMessage = { role: "user", content: input };
-    const updatedMessages = [...messages, userMessage];
-    
     setMessages(updatedMessages);
     setInput("");
     setIsLoading(true);
@@ -39,7 +39,6 @@ export default function AIChatWidget({ renderProduct }) {
 
       if (!response.ok) throw new Error("Failed");
 
-      // Set up streaming reader
       const reader = response.body.getReader();
       const decoder = new TextDecoder();
       let assistantContent = "";
@@ -50,8 +49,8 @@ export default function AIChatWidget({ renderProduct }) {
         const { done, value } = await reader.read();
         if (done) break;
 
-        const text = decoder.decode(value);
-        assistantContent += text;
+        const chunkText = decoder.decode(value);
+        assistantContent += chunkText;
 
         setMessages((prev) => {
           const newMsg = [...prev];
@@ -68,6 +67,21 @@ export default function AIChatWidget({ renderProduct }) {
     } finally {
       setIsLoading(false);
     }
+  }, []);
+
+  useEffect(() => {
+    if (!externalPrompt || externalPrompt === lastHandledPrompt.current) return;
+    lastHandledPrompt.current = externalPrompt;
+    setIsOpen(true);
+    sendMessage(externalPrompt, messagesRef.current);
+    onExternalPromptHandled?.();
+  }, [externalPrompt, onExternalPromptHandled, sendMessage]);
+
+  const handleSend = async (e) => {
+    e?.preventDefault();
+    if (!input.trim() || isLoading) return;
+
+    await sendMessage(input.trim(), messages);
   };
 
   return (
