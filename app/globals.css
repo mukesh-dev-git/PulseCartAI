@@ -1048,6 +1048,78 @@ button {
   background: var(--orange-mid);
 }
 
+/* ─── Cart AI Suggestions ────────────────── */
+.sug-section {
+  margin-top: 8px;
+  padding-top: 12px;
+  border-top: 1.5px dashed var(--border-2);
+}
+
+.sug-hd {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  margin-bottom: 10px;
+  font-family: var(--f-montserrat);
+  font-size: 0.78rem;
+  font-weight: 800;
+  color: var(--orange);
+}
+
+.sug-loading {
+  display: flex;
+  justify-content: center;
+  padding: 14px 0;
+}
+
+.sug-item {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  padding: 9px 10px;
+  border: 1px solid #f0d4c2;
+  border-radius: var(--r-sm);
+  background: linear-gradient(135deg, #fffaf7, #fff3ec);
+  margin-bottom: 6px;
+}
+
+.sug-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.sug-reason {
+  font-family: var(--f-nunito);
+  font-size: 0.67rem;
+  font-weight: 600;
+  color: var(--text-3);
+  margin-top: 2px;
+  line-height: 1.3;
+}
+
+.sug-add {
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  padding: 5px 10px;
+  border: 1.5px solid var(--orange);
+  border-radius: var(--r-xs);
+  background: #fff;
+  color: var(--orange);
+  font-family: var(--f-nunito);
+  font-size: 0.72rem;
+  font-weight: 800;
+  cursor: pointer;
+  transition: var(--tr);
+  flex-shrink: 0;
+  white-space: nowrap;
+}
+
+.sug-add:hover {
+  background: var(--orange);
+  color: #fff;
+}
+
 /* ─── Toast ─────────────────────────────── */
 .toast {
   position: fixed;

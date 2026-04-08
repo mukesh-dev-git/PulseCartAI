@@ -1,5 +1,5 @@
 "use client";
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect, useRef } from "react";
 import products from "@/data/products.json";
 import {
   PulseCartLogo, SearchIcon, CartIcon, UserIcon,
@@ -125,9 +125,41 @@ function ProductCard({ product, cartQty, onAdd, onQty, wishlist, onWish, aiReaso
 }
 
 /* ─── Cart Drawer ───────────────────────── */
-function CartDrawer({ open, onClose, cart, onQty, onRemove }) {
+function CartDrawer({ open, onClose, cart, onQty, onRemove, onAdd }) {
   const subtotal = cart.reduce((s, i) => s + i.price * i.qty, 0);
   const shipping = subtotal > 0 && subtotal < 265 ? 10 : 0;
+
+  const [suggestions, setSuggestions] = useState([]);
+  const [sugLoading, setSugLoading] = useState(false);
+  const lastCartKey = useRef("");
+
+  useEffect(() => {
+    if (!open || cart.length === 0) {
+      setSuggestions([]);
+      return;
+    }
+
+    const cartKey = cart.map(i => i.id).sort().join(",");
+    if (cartKey === lastCartKey.current) return;
+    lastCartKey.current = cartKey;
+
+    setSugLoading(true);
+    fetch("/api/suggest", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ cartItems: cart.map(i => ({ id: i.id, name: i.name, category: i.category })) }),
+    })
+      .then(r => r.json())
+      .then(data => {
+        const items = (data.suggestions || []).map(s => {
+          const p = products.find(pr => pr.id === s.id);
+          return p ? { ...p, reason: s.reason } : null;
+        }).filter(Boolean);
+        setSuggestions(items);
+      })
+      .catch(() => setSuggestions([]))
+      .finally(() => setSugLoading(false));
+  }, [open, cart]);
 
   return (
     <>
@@ -148,28 +180,67 @@ function CartDrawer({ open, onClose, cart, onQty, onRemove }) {
               <p>Your cart is empty.<br />Add items to get started.</p>
             </div>
           ) : (
-            cart.map((item) => (
-              <div key={item.id} className="c-item">
-                <div className="c-img">
-                  {item.image
-                    ? <img src={item.image} alt={item.name} />
-                    : <ProductPlaceholder category={item.category} />
-                  }
-                </div>
-                <div className="c-info">
-                  <p className="c-name">{item.name}</p>
-                  <p className="c-price">{formatMYR(item.price)}</p>
-                  <div className="c-qty">
-                    <button className="cq-btn" onClick={() => onQty(item.id, -1)} aria-label="Decrease"><MinusIcon size={11} /></button>
-                    <span className="cq-val">{item.qty}</span>
-                    <button className="cq-btn" onClick={() => onQty(item.id, +1)} aria-label="Increase"><PlusIcon size={11} /></button>
+            <>
+              {cart.map((item) => (
+                <div key={item.id} className="c-item">
+                  <div className="c-img">
+                    {item.image
+                      ? <img src={item.image} alt={item.name} />
+                      : <ProductPlaceholder category={item.category} />
+                    }
                   </div>
+                  <div className="c-info">
+                    <p className="c-name">{item.name}</p>
+                    <p className="c-price">{formatMYR(item.price)}</p>
+                    <div className="c-qty">
+                      <button className="cq-btn" onClick={() => onQty(item.id, -1)} aria-label="Decrease"><MinusIcon size={11} /></button>
+                      <span className="cq-val">{item.qty}</span>
+                      <button className="cq-btn" onClick={() => onQty(item.id, +1)} aria-label="Increase"><PlusIcon size={11} /></button>
+                    </div>
+                  </div>
+                  <button className="c-rm-btn c-rm" onClick={() => onRemove(item.id)} aria-label={`Remove ${item.name}`}>
+                    <CloseIcon size={12} />
+                  </button>
                 </div>
-                <button className="c-rm-btn c-rm" onClick={() => onRemove(item.id)} aria-label={`Remove ${item.name}`}>
-                  <CloseIcon size={12} />
-                </button>
-              </div>
-            ))
+              ))}
+
+              {/* AI Suggestions */}
+              {sugLoading && (
+                <div className="sug-section">
+                  <div className="sug-hd">
+                    <SparklesIcon size={14} />
+                    <span>Finding complementary products...</span>
+                  </div>
+                  <div className="sug-loading"><span className="ai-search-spinner" /></div>
+                </div>
+              )}
+              {!sugLoading && suggestions.length > 0 && (
+                <div className="sug-section">
+                  <div className="sug-hd">
+                    <SparklesIcon size={14} />
+                    <span>Complete Your Setup</span>
+                  </div>
+                  {suggestions.map(item => (
+                    <div key={item.id} className="sug-item">
+                      <div className="c-img">
+                        {item.image
+                          ? <img src={item.image} alt={item.name} />
+                          : <ProductPlaceholder category={item.category} />
+                        }
+                      </div>
+                      <div className="sug-info">
+                        <p className="c-name">{item.name}</p>
+                        <p className="c-price">{formatMYR(item.price)}</p>
+                        <p className="sug-reason">{item.reason}</p>
+                      </div>
+                      <button className="sug-add" onClick={() => onAdd(item)} aria-label={`Add ${item.name}`}>
+                        <PlusIcon size={11} /> Add
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </>
           )}
         </div>
 
@@ -562,6 +633,7 @@ export default function Home() {
         cart={cart}
         onQty={handleQty}
         onRemove={handleRemove}
+        onAdd={handleAdd}
       />
 
       {/* ── Wishlist Drawer ── */}

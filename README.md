@@ -37,6 +37,12 @@ PulseCart AI is a smart e-commerce prototype that demonstrates how AI can enhanc
 - Catalog-aware — the AI knows every product in the store and can recommend, compare, and answer questions
 - Rich product cards rendered inline when the AI references a product
 
+### Smart Cart Suggestions
+- When items are in the cart, AI analyzes what's there and suggests **2-3 complementary products** ("Complete Your Setup")
+- Each suggestion includes a short reason (e.g., *"Perfect companion for your laptop"*) and a quick **Add** button
+- Fetches fresh suggestions whenever the cart contents change
+- Displayed in a warm-styled section inside the cart drawer with loading state
+
 ### Smart Nudge Engine
 - **Hesitation Detection** — Detects when a user hovers on a product for 3+ seconds and surfaces an AI insight nudge with an **"Ask AI about this"** button that opens the chatbot with a pre-filled prompt about that product
 - **Low Stock Urgency** — Alerts when a wishlisted item is running low on stock
@@ -70,7 +76,8 @@ PulseCartAI/
 │   ├── globals.css                  # Global styles
 │   ├── api/
 │   │   ├── chat/route.js            # POST /api/chat — Groq streaming endpoint
-│   │   └── search/route.js          # POST /api/search — AI smart search endpoint
+│   │   ├── search/route.js          # POST /api/search — AI smart search endpoint
+│   │   └── suggest/route.js         # POST /api/suggest — Cart suggestion endpoint
 │   └── components/
 │       ├── AIChatWidget.js          # Floating AI chat panel
 │       ├── AIChatWidget.module.css
@@ -117,6 +124,7 @@ Open [http://localhost:3000](http://localhost:3000) to see the app.
 |---|---|---|
 | POST | `/api/chat` | Sends conversation to Groq LLaMA 3.1 and streams the response back |
 | POST | `/api/search` | AI-powered product search — returns ranked product IDs with match reasons |
+| POST | `/api/suggest` | Cart-based AI suggestions — returns complementary product recommendations |
 
 ---
 
