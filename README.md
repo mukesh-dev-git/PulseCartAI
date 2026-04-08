@@ -86,7 +86,7 @@ PulseCartAI/
 │       ├── NudgeToast.js            # Toast notification for nudges
 │       └── NudgeToast.module.css
 ├── data/
-│   └── products.json                # Product catalog (31 items)
+│   └── products.json                # Product catalog (45 items)
 ├── package.json
 └── vercel.json
 ```
