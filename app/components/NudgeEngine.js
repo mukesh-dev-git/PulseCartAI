@@ -1,80 +1,180 @@
 "use client";
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useCallback } from "react";
 import { BotIcon, LightningIcon, CartIcon } from "./Icons";
 /**
- * NudgeEngine — Simulates a real-time AI intent prediction and
- * MAB (Multi-Armed Bandit) decision engine by monitoring user
- * micro-behaviours and firing contextual nudge notifications.
+ * NudgeEngine — Monitors user micro-behaviours and fires contextual
+ * nudge notifications.
  *
  * Triggers:
- *  1. HESITATION  – hover on product card > 3s  → prompt to ask AI
- *  2. LOW STOCK   – a wishlisted item has ≤ 5 stock → urgency nudge
- *  3. CART IDLE   – cart has items but user is idle 30s → recovery nudge
- *  4. SOCIAL PROOF – a low-stock product is viewed (mouse-enter)
+ *  1. HESITATION
+ *     Desktop: hover on product card > 3s (event delegation)
+ *     Mobile:  product card visible in viewport center > 4s while scroll idle
+ *  2. LOW STOCK – wishlisted item has ≤ 5 stock → urgency nudge
+ *  3. CART IDLE – cart has items but user idle 30s → recovery nudge
  */
 export default function NudgeEngine({ cart, wishlist, allProducts, onNudge }) {
   const hoverTimers = useRef({});
+  const visibilityTimers = useRef({});
   const cartIdleTimer = useRef(null);
-  const firedNudges = useRef(new Set());
-  const lastCartLength = useRef(0);
+  const firedHesitation = useRef(new Set());
+  const firedLowStock = useRef(new Set());
+  const cartIdleFired = useRef(false);
+  const isTouchDevice = useRef(false);
+  const allProductsRef = useRef(allProducts);
+  allProductsRef.current = allProducts;
+  const onNudgeRef = useRef(onNudge);
+  onNudgeRef.current = onNudge;
 
-  /* ── 1. Hesitation detection: hover on .p-card > 3s ── */
+  const fireHesitationNudge = useCallback((productId) => {
+    if (firedHesitation.current.has(productId)) return;
+    const product = allProductsRef.current.find(p => p.id === parseInt(productId));
+    if (!product) return;
+    firedHesitation.current.add(productId);
+
+    onNudgeRef.current({
+      type: "hesitation",
+      icon: <BotIcon size={18} />,
+      title: "AI Insight",
+      message: `Curious about ${product.name.split(" ").slice(0, 3).join(" ")}? Ask our AI if it fits your needs!`,
+      productName: product.name,
+    });
+  }, []);
+
+  /* ── 1a. Desktop: Hover detection via event delegation ── */
   useEffect(() => {
-    const handleMouseEnter = (e) => {
-      const card = e.currentTarget;
-      const productId = card.id?.replace("product-", "");
-      if (!productId) return;
+    const getCardProductId = (target) => {
+      const card = target.closest(".p-card");
+      if (!card) return null;
+      return card.id?.replace("product-", "") || null;
+    };
+
+    const handleMouseOver = (e) => {
+      if (isTouchDevice.current) return;
+      const productId = getCardProductId(e.target);
+      if (!productId || hoverTimers.current[productId]) return;
 
       hoverTimers.current[productId] = setTimeout(() => {
-        const product = allProducts.find(p => p.id === parseInt(productId));
-        if (!product) return;
-        const key = `hesitation-${productId}`;
-        if (firedNudges.current.has(key)) return;
-        firedNudges.current.add(key);
-
-        onNudge({
-          type: "hesitation",
-          icon: <BotIcon size={18} />,
-          title: "AI Insight",
-          message: `Curious about ${product.name.split(" ").slice(0, 3).join(" ")}? Ask our AI if it fits your needs!`,
-          productName: product.name,
-        });
+        delete hoverTimers.current[productId];
+        fireHesitationNudge(productId);
       }, 3000);
     };
 
-    const handleMouseLeave = (e) => {
-      const productId = e.currentTarget.id?.replace("product-", "");
-      if (productId && hoverTimers.current[productId]) {
-        clearTimeout(hoverTimers.current[productId]);
-        delete hoverTimers.current[productId];
+    const handleMouseOut = (e) => {
+      if (isTouchDevice.current) return;
+      const productId = getCardProductId(e.target);
+      if (!productId) return;
+
+      const card = document.getElementById(`product-${productId}`);
+      if (card && !card.contains(e.relatedTarget)) {
+        if (hoverTimers.current[productId]) {
+          clearTimeout(hoverTimers.current[productId]);
+          delete hoverTimers.current[productId];
+        }
       }
     };
 
-    const cards = document.querySelectorAll(".p-card");
-    cards.forEach(card => {
-      card.addEventListener("mouseenter", handleMouseEnter);
-      card.addEventListener("mouseleave", handleMouseLeave);
-    });
+    const handleTouchStart = () => { isTouchDevice.current = true; };
+
+    document.addEventListener("touchstart", handleTouchStart, { once: true, passive: true });
+    document.addEventListener("mouseover", handleMouseOver);
+    document.addEventListener("mouseout", handleMouseOut);
 
     return () => {
-      cards.forEach(card => {
-        card.removeEventListener("mouseenter", handleMouseEnter);
-        card.removeEventListener("mouseleave", handleMouseLeave);
-      });
+      document.removeEventListener("touchstart", handleTouchStart);
+      document.removeEventListener("mouseover", handleMouseOver);
+      document.removeEventListener("mouseout", handleMouseOut);
       Object.values(hoverTimers.current).forEach(clearTimeout);
+      hoverTimers.current = {};
     };
-  }, [allProducts, onNudge]);
+  }, [fireHesitationNudge]);
+
+  /* ── 1b. Mobile: IntersectionObserver + scroll-idle detection ── */
+  useEffect(() => {
+    let scrollTimeout = null;
+    let isScrolling = false;
+    let observer = null;
+    const visibleCards = new Set();
+
+    const startTimerForCard = (productId) => {
+      if (visibilityTimers.current[productId] || firedHesitation.current.has(productId)) return;
+      visibilityTimers.current[productId] = setTimeout(() => {
+        delete visibilityTimers.current[productId];
+        fireHesitationNudge(productId);
+      }, 4000);
+    };
+
+    const clearTimerForCard = (productId) => {
+      if (visibilityTimers.current[productId]) {
+        clearTimeout(visibilityTimers.current[productId]);
+        delete visibilityTimers.current[productId];
+      }
+    };
+
+    const onScrollIdle = () => {
+      isScrolling = false;
+      visibleCards.forEach(id => startTimerForCard(id));
+    };
+
+    const onScroll = () => {
+      isScrolling = true;
+      Object.keys(visibilityTimers.current).forEach(clearTimerForCard);
+      clearTimeout(scrollTimeout);
+      scrollTimeout = setTimeout(onScrollIdle, 600);
+    };
+
+    observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        const productId = entry.target.id?.replace("product-", "");
+        if (!productId) return;
+
+        if (entry.isIntersecting) {
+          visibleCards.add(productId);
+          if (!isScrolling) startTimerForCard(productId);
+        } else {
+          visibleCards.delete(productId);
+          clearTimerForCard(productId);
+        }
+      });
+    }, {
+      threshold: 0.6,
+    });
+
+    const attachObserver = () => {
+      document.querySelectorAll(".p-card").forEach(card => {
+        observer.observe(card);
+      });
+    };
+
+    attachObserver();
+    const mutationObs = new MutationObserver(() => {
+      document.querySelectorAll(".p-card").forEach(card => {
+        observer.observe(card);
+      });
+    });
+    mutationObs.observe(document.body, { childList: true, subtree: true });
+
+    window.addEventListener("scroll", onScroll, { passive: true });
+
+    return () => {
+      window.removeEventListener("scroll", onScroll);
+      clearTimeout(scrollTimeout);
+      observer.disconnect();
+      mutationObs.disconnect();
+      Object.values(visibilityTimers.current).forEach(clearTimeout);
+      visibilityTimers.current = {};
+    };
+  }, [fireHesitationNudge]);
 
   /* ── 2. Low-stock wishlist nudge ── */
   useEffect(() => {
     wishlist.forEach(id => {
-      const key = `lowstock-${id}`;
-      if (firedNudges.current.has(key)) return;
+      const key = `${id}`;
+      if (firedLowStock.current.has(key)) return;
 
       const product = allProducts.find(p => p.id === id);
       if (!product || product.stockCount > 5) return;
 
-      firedNudges.current.add(key);
+      firedLowStock.current.add(key);
       setTimeout(() => {
         onNudge({
           type: "urgency",
@@ -87,34 +187,35 @@ export default function NudgeEngine({ cart, wishlist, allProducts, onNudge }) {
   }, [wishlist, allProducts, onNudge]);
 
   /* ── 3. Cart idle recovery nudge ── */
+  const resetIdleTimer = useCallback(() => {
+    clearTimeout(cartIdleTimer.current);
+    cartIdleTimer.current = null;
+  }, []);
+
   useEffect(() => {
     if (cart.length === 0) {
-      clearTimeout(cartIdleTimer.current);
-      lastCartLength.current = 0;
+      resetIdleTimer();
+      cartIdleFired.current = false;
       return;
     }
 
-    // Reset timer if cart changed
-    if (cart.length !== lastCartLength.current) {
-      lastCartLength.current = cart.length;
-      clearTimeout(cartIdleTimer.current);
+    resetIdleTimer();
+    cartIdleFired.current = false;
 
-      const key = `cart-idle-${Date.now()}`;
-      cartIdleTimer.current = setTimeout(() => {
-        if (firedNudges.current.has("cart-idle")) return;
-        firedNudges.current.add("cart-idle");
-        const total = cart.reduce((s, i) => s + i.price * i.qty, 0);
-        onNudge({
-          type: "recovery",
-          icon: <CartIcon size={18} />,
-          title: "Your cart misses you",
-          message: `You have RM${total.toLocaleString("en-MY")} worth of items waiting. Complete your order?`,
-        });
-      }, 30000);
-    }
+    cartIdleTimer.current = setTimeout(() => {
+      if (cartIdleFired.current) return;
+      cartIdleFired.current = true;
+      const total = cart.reduce((s, i) => s + i.price * i.qty, 0);
+      onNudge({
+        type: "recovery",
+        icon: <CartIcon size={18} />,
+        title: "Your cart misses you",
+        message: `You have RM${total.toLocaleString("en-MY")} worth of items waiting. Complete your order?`,
+      });
+    }, 30000);
 
-    return () => clearTimeout(cartIdleTimer.current);
-  }, [cart, onNudge]);
+    return () => resetIdleTimer();
+  }, [cart, onNudge, resetIdleTimer]);
 
-  return null; // pure logic — no DOM output
+  return null;
 }

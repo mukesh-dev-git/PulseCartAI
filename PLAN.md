@@ -1,139 +1,186 @@
-# 🚀 Project Name: PulseCart AI
+# PulseCart AI — Project Plan
+
 **Tagline:** Real-time intent. Instant personalization.
 
 ---
 
-# 📄 Plan.md
-
 ## 1. Overview
 
-**PulseCart AI** is an intelligent e-commerce optimization system that analyzes real-time user behavior (“micro-moments”) to predict intent and dynamically personalize the shopping experience. It combines predictive models, decision intelligence, and LLM-powered insights to increase engagement, conversions, and trust.
+**PulseCart AI** is an intelligent e-commerce prototype that demonstrates how AI can enhance the online shopping experience. It uses LLM-powered features to provide smart search, contextual recommendations, conversational assistance, and behavioral nudges — all in real-time.
+
+This is a **demo/prototype** focused on showcasing AI capabilities in an e-commerce context, not a production-ready system.
 
 ---
 
 ## 2. Problem Statement
 
-Traditional e-commerce systems rely heavily on historical data, missing real-time user intent signals. This leads to:
-- Poor personalization  
-- Lost conversions  
-- Generic recommendations  
-- Lack of trust in AI suggestions  
+Traditional e-commerce platforms suffer from:
+- Generic, keyword-only search that misses user intent
+- Static recommendations that don't adapt to current session behavior
+- No conversational assistance for product questions
+- Missed conversion opportunities from hesitant users
 
 ---
 
 ## 3. Solution
 
-A **real-time AI pipeline** that:
-- Tracks live user behavior  
-- Predicts intent instantly  
-- Selects optimal actions dynamically  
-- Personalizes UI and recommendations  
-- Enhances trust via RAG-based insights  
+A **smart storefront prototype** that:
+- Understands natural language search queries (not just keywords)
+- Provides AI-generated product recommendations based on cart context
+- Offers a conversational shopping assistant that knows the entire catalog
+- Detects user hesitation and proactively offers AI assistance
+- Surfaces urgency and recovery nudges to improve conversions
 
 ---
 
-## 4. Tech Stack
+## 4. Current Implementation
 
-### Frontend
-- React.js  
-- Tailwind CSS  
-- Event tracking (hover, scroll, click)  
+### Tech Stack
 
-### Backend
-- Node.js (API + event processing)  
+| Layer | Technology |
+|-------|------------|
+| **Framework** | Next.js 16 (App Router) |
+| **UI** | React 19, Client Components |
+| **Styling** | Vanilla CSS + CSS Modules |
+| **Fonts** | Google Fonts (Saira Stencil One, Montserrat, Nunito) |
+| **AI/LLM** | LLaMA 3.1 8B Instant via Groq SDK |
+| **Data** | Static JSON product catalog (45 items) |
+| **Deployment** | Vercel |
 
-### Database
-- PostgreSQL / MongoDB (structured + session data)  
-- Vector Database (semantic search for RAG)  
+### Implemented Features
 
-### AI/ML Models
-- **GRU / Transformer** → Intent prediction  
-- **Multi-Armed Bandit (MAB)** → Action selection (nudges)  
-- **Graph Neural Network (GNN)** → Recommendations  
-- **LLaMA-3 (via Groq / Hugging Face)** → Insights + chatbot  
-
-### Orchestration
-- LangChain (RAG pipeline)  
-
----
-
-## 5. System Pipeline
-
-1. User performs actions (hover, scroll, click)  
-2. Frontend captures events  
-3. Backend processes session data  
-4. Intent model predicts user intent score  
-5. Decision engine (MAB) selects best action  
-6. Recommendation engine (GNN) suggests products  
-7. LLM generates contextual insights  
-8. UI updates in real-time  
+| Feature | Status | Description |
+|---------|--------|-------------|
+| Product Catalog | Done | 45 products across 5 categories with filtering |
+| Shopping Cart | Done | Drawer with qty controls, subtotal, delivery logic |
+| Wishlist | Done | Save/remove items, move to cart |
+| AI Smart Search | Done | Natural language search with intent understanding |
+| AI Chat Assistant | Done | Streaming LLM chat, catalog-aware, inline product cards |
+| Smart Cart Suggestions | Done | AI recommends complementary products in cart |
+| Hesitation Nudge | Done | Hover detection → AI insight with "Ask AI" button |
+| Low Stock Nudge | Done | Alerts for low-stock wishlisted items |
+| Cart Recovery Nudge | Done | Reminds users about idle cart items |
 
 ---
 
-## 6. Data Utilization
+## 5. System Flow
 
-| Data Source      | Usage                          |
-|-----------------|-------------------------------|
-| User Behavior   | Intent prediction              |
-| Product Data    | Recommendation engine          |
-| Reviews         | Quality & value analysis       |
-| Social Media    | Trend & sentiment analysis     |
+```
+┌─────────────────────────────────────────────────────────────────┐
+│                        USER INTERACTIONS                         │
+└─────────────────────────────────────────────────────────────────┘
+                                │
+        ┌───────────────────────┼───────────────────────┐
+        ▼                       ▼                       ▼
+   ┌─────────┐            ┌─────────┐            ┌─────────┐
+   │ Search  │            │  Chat   │            │  Cart   │
+   │  Bar    │            │ Widget  │            │ Drawer  │
+   └────┬────┘            └────┬────┘            └────┬────┘
+        │                      │                      │
+        ▼                      ▼                      ▼
+┌───────────────┐    ┌───────────────┐    ┌───────────────┐
+│ POST /api/    │    │ POST /api/    │    │ POST /api/    │
+│    search     │    │     chat      │    │    suggest    │
+└───────┬───────┘    └───────┬───────┘    └───────┬───────┘
+        │                    │                    │
+        └────────────────────┼────────────────────┘
+                             ▼
+                    ┌─────────────────┐
+                    │   Groq API      │
+                    │ (LLaMA 3.1 8B)  │
+                    └────────┬────────┘
+                             │
+                             ▼
+                    ┌─────────────────┐
+                    │  JSON Response  │
+                    │ (parsed + post- │
+                    │   filtered)     │
+                    └────────┬────────┘
+                             │
+                             ▼
+                    ┌─────────────────┐
+                    │   React UI      │
+                    │   Updates       │
+                    └─────────────────┘
+```
+
+### Nudge Engine Flow
+
+```
+┌─────────────────────────────────────────────────────────────────┐
+│                    NUDGE ENGINE (Client-Side)                    │
+└─────────────────────────────────────────────────────────────────┘
+                                │
+        ┌───────────────────────┼───────────────────────┐
+        ▼                       ▼                       ▼
+┌───────────────┐      ┌───────────────┐      ┌───────────────┐
+│   Hover on    │      │  Wishlisted   │      │   Cart has    │
+│  product >3s  │      │  item is low  │      │ items + idle  │
+│               │      │    stock      │      │    30 sec     │
+└───────┬───────┘      └───────┬───────┘      └───────┬───────┘
+        │                      │                      │
+        ▼                      ▼                      ▼
+┌───────────────┐      ┌───────────────┐      ┌───────────────┐
+│  Hesitation   │      │   Urgency     │      │   Recovery    │
+│    Nudge      │      │    Nudge      │      │    Nudge      │
+│ + Ask AI btn  │      │               │      │               │
+└───────────────┘      └───────────────┘      └───────────────┘
+```
 
 ---
 
-## 7. Key Features (User Output)
+## 6. API Endpoints
 
-- 🎯 Smart Nudges (discounts, urgency signals)  
-- 🛍️ Personalized product recommendations  
-- 💡 “Value for Money” insights  
-- 🤖 AI-powered chatbot assistance  
-- ⚡ Real-time UI adaptation  
-
----
-
-## 8. Core Innovation
-
-### 1. Micro-Moment Intelligence
-Uses real-time behavioral signals instead of historical data  
-
-### 2. RAG-Based Trust Layer
-Grounds AI outputs in verified internal data  
-
-### 3. Hyper-Localized AI
-Incorporates social + regional trends  
-
-### 4. Hybrid AI Stack
-Combines GRU, GNN, and LLMs for specialized tasks  
-
-### 5. Agentic Personalization
-Dynamically adapts UI and experience per user  
+| Endpoint | Method | Purpose | Response |
+|----------|--------|---------|----------|
+| `/api/chat` | POST | Conversational AI assistant | Streaming text/plain |
+| `/api/search` | POST | Natural language product search | JSON: `{summary, results}` |
+| `/api/suggest` | POST | Cart-based product suggestions | JSON: `{suggestions}` |
 
 ---
 
-## 9. System Architecture (Conceptual)
-**User → Frontend Tracking → Backend → Intent Model → Decision Engine → Recommendation Engine → LLM (RAG) → UI Update**
+## 7. Data Model
 
+Products are stored in `data/products.json` with this schema:
+
+```json
+{
+  "id": 1,
+  "slug": "product-slug",
+  "name": "Product Name",
+  "category": "Category",
+  "price": 1234,
+  "originalPrice": 1500,
+  "discount": 18,
+  "rating": 4.5,
+  "reviews": 1234,
+  "badge": "Best Seller",
+  "description": "Product description",
+  "features": ["Feature 1", "Feature 2"],
+  "image": "https://...",
+  "inStock": true,
+  "stockCount": 10
+}
+```
+
+Categories: `Headphones`, `Smartwatch`, `Laptop`, `Camera`, `Keyboard`
 
 ---
 
-## 10. One-Line Summary
+## 8. Future Enhancements
 
-**Track behavior → predict intent → take best action → personalize instantly**
+| Feature | Description | Priority |
+|---------|-------------|----------|
+| Product Detail Modal | Click product → modal with AI-generated summary | High |
+| Social Proof Toasts | "X people bought this" simulated activity | Medium |
+| AI "For You" Section | Session-based personalized recommendations | Medium |
+| Persistent Cart | LocalStorage or backend persistence | Medium |
+| User Auth | Login/signup with session management | Low |
+| Checkout Flow | Payment integration (Stripe) | Low |
+| Voice Search | Speech-to-text for search queries | Low |
 
 ---
 
-## 11. Future Enhancements
+## 9. One-Line Summary
 
-- Voice-based shopping assistant  
-- Edge deployment for faster inference  
-- Reinforcement learning for continuous improvement  
-- AR-based product visualization  
-
----
-
-## 12. Impact
-
-- 📈 Increased conversion rates  
-- 🎯 Better user engagement  
-- 🤝 Improved trust in AI recommendations  
-- 🛒 Higher cart value  
+**Search naturally → Get AI recommendations → Chat for help → Complete your setup**
