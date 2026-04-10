@@ -34,12 +34,12 @@ const BADGE_CLASS = {
 const formatMYR = (n) => "RM" + n.toLocaleString("en-MY");
 
 /* ─── Product Card ── Zepto-style compact ─ */
-function ProductCard({ product, cartQty, onAdd, onQty, wishlist, onWish, aiReason }) {
+function ProductCard({ product, cartQty, onAdd, onQty, wishlist, onWish, aiReason, onClick }) {
   const inCart = cartQty > 0;
   const wished = wishlist.includes(product.id);
 
   return (
-    <article className="p-card" id={`product-${product.id}`} aria-label={product.name}>
+    <article className="p-card" id={`product-${product.id}`} aria-label={product.name} onClick={onClick}>
 
       {/* ── Inner image box (the white square) ── */}
       <div className="p-img-box">
@@ -337,6 +337,156 @@ function AdBanner({ src, alt = "Advertisement", id }) {
   );
 }
 
+/* ─── Product Detail Modal ─────────────── */
+function ProductModal({ product, onClose, cartQty, onAdd, onQty, wishlist, onWish, onAskAI }) {
+  const [verdict, setVerdict] = useState(null);
+  const [verdictLoading, setVerdictLoading] = useState(true);
+  const wished = wishlist.includes(product.id);
+  const inCart = cartQty > 0;
+
+  useEffect(() => {
+    document.body.style.overflow = "hidden";
+    setVerdictLoading(true);
+    fetch("/api/verdict", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ productId: product.id }),
+    })
+      .then(r => r.json())
+      .then(d => setVerdict(d.verdict))
+      .catch(() => setVerdict(null))
+      .finally(() => setVerdictLoading(false));
+
+    return () => { document.body.style.overflow = ""; };
+  }, [product.id]);
+
+  return (
+    <>
+      <div className="overlay open" onClick={onClose} />
+      <div className="pm-modal" role="dialog" aria-label={product.name}>
+        <button className="pm-close" onClick={onClose} aria-label="Close">
+          <CloseIcon size={16} />
+        </button>
+
+        <div className="pm-scroll">
+          <div className="pm-top">
+            <div className="pm-img">
+              {product.image ? (
+                <img src={product.image} alt={product.name} />
+              ) : (
+                <ProductPlaceholder category={product.category} />
+              )}
+              {product.badge && (
+                <span className={`p-badge ${BADGE_CLASS[product.badge] || "new"}`}>
+                  {product.badge}
+                </span>
+              )}
+            </div>
+
+            <div className="pm-details">
+              <p className="pm-category">{product.category}</p>
+              <h2 className="pm-name">{product.name}</h2>
+
+              <div className="pm-rating">
+                <div className="r-pill" style={{ fontSize: "0.8rem", padding: "3px 8px" }}>
+                  <span style={{ color: "var(--star)" }}><StarIcon size={12} /></span>
+                  {product.rating}
+                </div>
+                <span className="r-count" style={{ fontSize: "0.8rem" }}>
+                  ({product.reviews?.toLocaleString()} reviews)
+                </span>
+              </div>
+
+              <div className="pm-price-row">
+                <span className="pm-price">{formatMYR(product.price)}</span>
+                <span className="p-mrp" style={{ fontSize: "0.9rem" }}>{formatMYR(product.originalPrice)}</span>
+                <span className="p-off" style={{ fontSize: "0.85rem" }}>{product.discount}% off</span>
+              </div>
+
+              <p className="pm-desc">{product.description}</p>
+
+              <div className="pm-features">
+                {product.features?.map((f, i) => (
+                  <span key={i} className="pm-feat-chip">{f}</span>
+                ))}
+              </div>
+
+              <p className="pm-stock">
+                {product.inStock
+                  ? <><span className="pm-stock-dot in" /> {product.stockCount > 10 ? "In Stock" : `Only ${product.stockCount} left`}</>
+                  : <><span className="pm-stock-dot out" /> Out of Stock</>
+                }
+              </p>
+            </div>
+          </div>
+
+          {/* AI Verdict */}
+          <div className="pm-verdict">
+            <div className="pm-verdict-hd">
+              <SparklesIcon size={16} />
+              <span>AI Quick Verdict</span>
+            </div>
+
+            {verdictLoading ? (
+              <div className="pm-verdict-loading">
+                <span className="ai-search-spinner" />
+                <span>Analyzing product...</span>
+              </div>
+            ) : verdict ? (
+              <div className="pm-verdict-body">
+                <p className="pm-verdict-bestfor">{verdict.bestFor}</p>
+
+                <div className="pm-verdict-lists">
+                  <div className="pm-verdict-col">
+                    <p className="pm-verdict-label pros">Pros</p>
+                    {verdict.pros?.map((p, i) => (
+                      <p key={i} className="pm-verdict-item pro">+ {p}</p>
+                    ))}
+                  </div>
+                  <div className="pm-verdict-col">
+                    <p className="pm-verdict-label cons">Cons</p>
+                    {verdict.cons?.map((c, i) => (
+                      <p key={i} className="pm-verdict-item con">- {c}</p>
+                    ))}
+                  </div>
+                </div>
+
+                <p className="pm-verdict-final">{verdict.verdict}</p>
+              </div>
+            ) : (
+              <p className="pm-verdict-err">Verdict unavailable. Ask our AI chatbot instead!</p>
+            )}
+          </div>
+        </div>
+
+        {/* Sticky bottom actions */}
+        <div className="pm-actions">
+          <button className="pm-wish-btn" onClick={() => onWish(product.id)}>
+            <HeartIcon size={16} filled={wished} />
+          </button>
+          <button
+            className="pm-ask-btn"
+            onClick={() => { onAskAI(product.name); onClose(); }}
+          >
+            <SparklesIcon size={14} /> Ask AI
+          </button>
+          {!inCart ? (
+            <button className="pm-add-btn" onClick={() => onAdd(product)}>
+              <PlusIcon size={13} /> Add to Cart
+            </button>
+          ) : (
+            <div className="pm-qty-ctrl">
+              <button className="pm-q-btn" onClick={() => onQty(product.id, -1)}><MinusIcon size={14} /></button>
+              <span className="pm-q-num">{cartQty}</span>
+              <button className="pm-q-btn" onClick={() => onQty(product.id, +1)}><PlusIcon size={14} /></button>
+            </div>
+          )}
+        </div>
+      </div>
+    </>
+  );
+}
+
 /* ─── Main Page ─────────────────────────── */
 export default function Home() {
   const [activeCategory, setActiveCategory] = useState("All");
@@ -349,6 +499,7 @@ export default function Home() {
   const [nudge, setNudge] = useState(null);
   const [chatPrompt, setChatPrompt] = useState(null);
   const [aiSearch, setAiSearch] = useState({ active: false, loading: false, query: "", summary: "", results: [] });
+  const [selectedProduct, setSelectedProduct] = useState(null);
 
   const handleAskAI = useCallback((productName) => {
     setChatPrompt(`Tell me about ${productName}. Is it worth buying? What are its pros and cons?`);
@@ -617,6 +768,7 @@ export default function Home() {
                       wishlist={wishlist}
                       onWish={handleWish}
                       aiReason={aiReasonMap[p.id]}
+                      onClick={() => setSelectedProduct(p)}
                     />
                   </div>
                 ))
@@ -660,6 +812,19 @@ export default function Home() {
       />
 
       <NudgeToast nudge={nudge} onDismiss={() => setNudge(null)} onAskAI={handleAskAI} />
+
+      {selectedProduct && (
+        <ProductModal
+          product={selectedProduct}
+          onClose={() => setSelectedProduct(null)}
+          cartQty={cart.find(i => i.id === selectedProduct.id)?.qty || 0}
+          onAdd={handleAdd}
+          onQty={handleQty}
+          wishlist={wishlist}
+          onWish={handleWish}
+          onAskAI={handleAskAI}
+        />
+      )}
 
       <AIChatWidget
         renderProduct={handleRenderProduct}

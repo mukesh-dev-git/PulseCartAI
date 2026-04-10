@@ -31,6 +31,13 @@ PulseCart AI is a smart e-commerce prototype that demonstrates how AI can enhanc
 - Results banner shows a summary of what the AI found, with a clear button to reset
 - Falls back to instant text filtering while typing (AI triggers only on Enter)
 
+### Product Detail Page
+- Tap/click any product card to open a full detail modal
+- Shows all product info: image, price, discount, rating, description, features, stock status
+- **AI Quick Verdict** — auto-generated pros, cons, best-for summary, and final recommendation
+- Sticky bottom bar with Wishlist, **Ask AI**, and Add to Cart buttons
+- **Fully responsive** — takes full screen on mobile with touch-friendly layout
+
 ### AI Shopping Assistant
 - Floating chat widget powered by **LLaMA 3.1** (via Groq)
 - Streaming responses for real-time conversation feel
@@ -77,7 +84,8 @@ PulseCartAI/
 │   ├── api/
 │   │   ├── chat/route.js            # POST /api/chat — Groq streaming endpoint
 │   │   ├── search/route.js          # POST /api/search — AI smart search endpoint
-│   │   └── suggest/route.js         # POST /api/suggest — Cart suggestion endpoint
+│   │   ├── suggest/route.js         # POST /api/suggest — Cart suggestion endpoint
+│   │   └── verdict/route.js         # POST /api/verdict — AI product verdict
 │   └── components/
 │       ├── AIChatWidget.js          # Floating AI chat panel
 │       ├── AIChatWidget.module.css
@@ -125,6 +133,7 @@ Open [http://localhost:3000](http://localhost:3000) to see the app.
 | POST | `/api/chat` | Sends conversation to Groq LLaMA 3.1 and streams the response back |
 | POST | `/api/search` | AI-powered product search — returns ranked product IDs with match reasons |
 | POST | `/api/suggest` | Cart-based AI suggestions — returns complementary product recommendations |
+| POST | `/api/verdict` | AI product verdict — returns pros, cons, best-for, and recommendation |
 
 ---
 
