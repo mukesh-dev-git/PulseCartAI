@@ -54,8 +54,9 @@ A **smart storefront prototype** that:
 | Product Catalog | Done | 45 products across 5 categories with filtering |
 | Shopping Cart | Done | Drawer with qty controls, subtotal, delivery logic |
 | Wishlist | Done | Save/remove items, move to cart |
-| AI Smart Search | Done | Natural language search with intent understanding |
-| AI Chat Assistant | Done | Streaming LLM chat, catalog-aware, inline product cards |
+| AI Smart Search | Done | RAG-powered natural language search (embedding retrieval + LLM ranking) |
+| AI Chat Assistant | Done | Streaming LLM chat, RAG-grounded (embedding retrieval over catalog), inline product cards |
+| RAG Pipeline | Done | Local embedding model (Xenova/all-MiniLM-L6-v2) + file-backed vector store + cosine-similarity retrieval, see [DOCUMENTATION.md](DOCUMENTATION.md#rag-pipeline) |
 | Smart Cart Suggestions | Done | AI recommends complementary products in cart |
 | Hesitation Nudge | Done | Hover detection → AI insight with "Ask AI" button |
 | Low Stock Nudge | Done | Alerts for low-stock wishlisted items |

@@ -1,10 +1,17 @@
 import { Groq } from "groq-sdk";
 import fs from "fs";
 import path from "path";
+import { retrieveProducts } from "@/lib/retrieval";
 
 const groq = new Groq({
   apiKey: process.env.GROQ_API_KEY,
 });
+
+// Retrieval stage: pull a generous shortlist of semantically relevant
+// candidates before handing off to the LLM for ranking/explanation. This
+// keeps the generation stage's prompt small and focused instead of
+// re-sending the whole catalog on every keystroke-triggered search.
+const CANDIDATE_K = 15;
 
 export async function POST(req) {
   try {
@@ -16,13 +23,15 @@ export async function POST(req) {
     const dataPath = path.join(process.cwd(), "data", "products.json");
     const productsData = JSON.parse(fs.readFileSync(dataPath, "utf-8"));
 
-    const catalog = productsData.map(p =>
+    const candidates = await retrieveProducts(query, CANDIDATE_K);
+
+    const catalog = candidates.map(({ product: p }) =>
       `ID:${p.id} | ${p.name} | RM${p.price} (was RM${p.originalPrice}, ${p.discount}% off) | ${p.category} | Rating:${p.rating} (${p.reviews} reviews) | Stock:${p.stockCount} | Features: ${p.features?.join(", ")} | ${p.description}`
     ).join("\n");
 
     const systemPrompt = `You are a strict product search engine for PulseCart, an electronics store in Malaysia (currency: RM).
 
-Given a user's search query and the catalog below, return ONLY products that match ALL criteria.
+Given a user's search query and the catalog below (pre-filtered by semantic relevance), return ONLY products that match ALL criteria.
 
 CATALOG:
 ${catalog}
