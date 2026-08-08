@@ -1,34 +1,41 @@
 import { Groq } from "groq-sdk";
-import fs from "fs";
-import path from "path";
+import { retrieveProducts } from "@/lib/retrieval";
 
 // Initialize Groq client
 const groq = new Groq({
   apiKey: process.env.GROQ_API_KEY,
 });
 
+const TOP_K = 6;
+
 export async function POST(req) {
   try {
     const { messages } = await req.json();
 
-    // Read the products data to include in system context
-    const dataPath = path.join(process.cwd(), "data", "products.json");
-    const productsData = JSON.parse(fs.readFileSync(dataPath, "utf-8"));
+    // RAG retrieval: use the latest user message as the query and pull
+    // only the top-K semantically relevant products from the vector store,
+    // instead of injecting the entire catalog into the prompt every turn.
+    const lastUserMessage = [...messages].reverse().find((m) => m.role === "user");
+    const query = lastUserMessage?.content || "";
 
-    // Prepare a slimmed-down catalog for the prompt (prevent huge token counts)
-    const catalog = productsData.map(p =>
-      `ID: ${p.id} | ${p.name} (RM ${p.price}): ${p.description} (Stock: ${p.stockCount})`
-    ).join("\n");
+    const retrieved = await retrieveProducts(query, TOP_K);
 
-const systemPrompt = `You are the PulseCart AI Shopping Assistant. 
-You are an expert sales associate helping a customer on an e-commerce storefront in Malaysia. 
+    const catalog = retrieved
+      .map(
+        ({ product: p, score }) =>
+          `ID: ${p.id} | ${p.name} (RM ${p.price}): ${p.description} (Stock: ${p.stockCount}) [relevance: ${score.toFixed(2)}]`
+      )
+      .join("\n");
+
+    const systemPrompt = `You are the PulseCart AI Shopping Assistant.
+You are an expert sales associate helping a customer on an e-commerce storefront in Malaysia.
 Be concise, friendly, and nudging them towards making a purchase based on their needs.
 Recommend specific items from the catalog. The currency is RM (Malaysian Ringgit).
 IMPORTANT: Do NOT use any Markdown formatting. NO asterisks (**), NO hashes (#), NO bold or italics. Output raw plain text only.
 
 When you recommend a product, MUST output its ID exactly in this format: [PRODUCT:id] (for example: [PRODUCT:1]). Do NOT output the product details in your text if you use this tag, because the tag will automatically render a rich visual card for the user. Just say something like "Here is a great option:" followed by the tag!
 
-Here is the current live catalog:
+Below are the products retrieved as most relevant to the customer's latest message (via semantic search over the full catalog). Only recommend products from this retrieved list — if none of them truly fit, say so honestly instead of inventing details.
 ${catalog}`;
 
     const chatMessages = [

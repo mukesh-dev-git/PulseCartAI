@@ -10,10 +10,11 @@ Complete technical reference for the PulseCart AI prototype.
 2. [Project Structure](#project-structure)
 3. [Environment Setup](#environment-setup)
 4. [API Reference](#api-reference)
-5. [LLM Integration](#llm-integration)
-6. [Component Architecture](#component-architecture)
-7. [Styling System](#styling-system)
-8. [Data Schema](#data-schema)
+5. [RAG Pipeline](#rag-pipeline)
+6. [LLM Integration](#llm-integration)
+7. [Component Architecture](#component-architecture)
+8. [Styling System](#styling-system)
+9. [Data Schema](#data-schema)
 
 ---
 
@@ -148,7 +149,7 @@ Conversational AI assistant with streaming responses.
 
 **Features:**
 - Streams response tokens in real-time
-- Catalog-aware (entire product list in system prompt)
+- **RAG-powered**: the latest user message is embedded and used to retrieve the top-6 most semantically relevant products from the vector store — only those are injected into the system prompt (see [RAG Pipeline](#rag-pipeline))
 - Can reference products using `[PRODUCT:id]` syntax
 - Strips markdown formatting from output
 
@@ -182,6 +183,7 @@ AI-powered natural language product search.
 ```
 
 **Features:**
+- **Two-stage RAG**: retrieval stage embeds the query and shortlists the top-15 candidates by cosine similarity, then the LLM ranks/filters/explains within that shortlist (see [RAG Pipeline](#rag-pipeline))
 - Understands intent, not just keywords
 - Enforces price constraints (server-side post-filter)
 - Returns ranked results with explanations
@@ -223,6 +225,59 @@ Cart-based complementary product suggestions.
 - Excludes items already in cart
 - Returns 2-3 suggestions with reasons
 - Only suggests in-stock items
+
+---
+
+## RAG Pipeline
+
+PulseCart AI uses Retrieval-Augmented Generation for `/api/chat` and `/api/search`: instead of injecting the entire product catalog into every prompt, the relevant subset of products is **retrieved** via semantic similarity search and only that subset is passed to the LLM.
+
+### Why
+
+The earlier approach (documented above in git history) stuffed all 45 products into the system prompt on every request — "in-context learning" rather than retrieval. That doesn't scale (prompt grows linearly with catalog size, raising cost/latency and diluting relevance), and it isn't retrieval in any real sense. The RAG pipeline below replaces it.
+
+### Pipeline stages
+
+```
+┌───────────────┐   ┌───────────────┐   ┌───────────────┐   ┌───────────────┐
+│  1. Ingestion │──▶│  2. Embedding │──▶│ 3. Vector     │──▶│ 4. Retrieval  │
+│  products.json│   │  (offline)    │   │    Store      │   │  (at request  │
+│  → documents  │   │               │   │ embeddings.json│  │    time)      │
+└───────────────┘   └───────────────┘   └───────────────┘   └───────────────┘
+                                                                      │
+                                                                      ▼
+                                                            ┌───────────────┐
+                                                            │ 5. Generation │
+                                                            │  LLM sees only│
+                                                            │  top-K matches│
+                                                            └───────────────┘
+```
+
+**1. Document ingestion** — [`scripts/build-embeddings.mjs`](../scripts/build-embeddings.mjs) reads `data/products.json` and builds one retrieval "document" per product by concatenating its name, category, description, features, price, and badge into a single text blob.
+
+**2. Embedding** — Each document is embedded with **`Xenova/all-MiniLM-L6-v2`**, a distilled sentence-transformer that runs fully on-device via [`@xenova/transformers`](https://www.npmjs.com/package/@xenova/transformers) (transformers.js) — no external embedding API or key required. Output is a 384-dimension vector, mean-pooled and L2-normalized.
+
+**3. Vector store** — Vectors are written to `data/embeddings.json` (`{id, document, embedding}[]`). This is a small, file-backed vector store — appropriate for a 45-product catalog. Swapping in Pinecone/Chroma/pgvector would only mean replacing the load/query logic in [`lib/retrieval.js`](../lib/retrieval.js); the ingestion and embedding stages are unchanged.
+
+**4. Retrieval** — At request time, [`lib/retrieval.js`](../lib/retrieval.js) embeds the incoming query with the same model, then ranks every stored vector by **cosine similarity** and returns the top-K products:
+- `/api/chat` — top **6** products, keyed off the latest user message
+- `/api/search` — top **15** candidates, then re-ranked/filtered/explained by the LLM (retrieval narrows the field; generation does the reasoning)
+
+**5. Generation** — The retrieved products (not the full catalog) are injected into the system prompt. This keeps prompts small, keeps answers grounded in genuinely relevant items, and lets the model explicitly say "none of these fit" instead of inventing a match from products it was never shown.
+
+### Regenerating the vector store
+
+Whenever `data/products.json` changes, rebuild the embeddings:
+
+```bash
+npm run embed
+```
+
+This overwrites `data/embeddings.json`. The file is committed to the repo so the app can start without needing to re-embed the catalog on every boot/deploy.
+
+### Accuracy notes
+
+Retrieval is embedding-based (semantic), so it survives paraphrasing that keyword search would miss — e.g. "something for long flights" retrieves noise-cancelling headphones even though neither word appears in the catalog. It's still similarity search, not perfect intent parsing: retrieval is the *recall* stage (get plausible candidates), and the LLM generation stage is the *precision* stage (reason about which of those candidates truly fits, apply hard constraints like price, and explain why).
 
 ---
 

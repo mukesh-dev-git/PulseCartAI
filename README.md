@@ -26,6 +26,7 @@ PulseCart AI is a smart e-commerce prototype that demonstrates how AI can enhanc
 
 ### AI Smart Search
 - Type a natural language query and press **Enter** (or click the sparkle button) to trigger AI-powered search
+- **Retrieval-Augmented**: query is embedded and matched against a vector store of the catalog before the LLM ranks and explains the shortlist (see [RAG Pipeline](DOCUMENTATION.md#rag-pipeline))
 - Understands intent — queries like *"best laptop for coding"*, *"gift under RM200"*, or *"wireless headphones for gym"* all work
 - Returns ranked results with a per-product **AI reason chip** explaining why each product matches
 - Results banner shows a summary of what the AI found, with a clear button to reset
@@ -41,7 +42,8 @@ PulseCart AI is a smart e-commerce prototype that demonstrates how AI can enhanc
 ### AI Shopping Assistant
 - Floating chat widget powered by **LLaMA 3.1** (via Groq)
 - Streaming responses for real-time conversation feel
-- Catalog-aware — the AI knows every product in the store and can recommend, compare, and answer questions
+- **RAG-grounded** — each message is embedded and used to retrieve the top-6 relevant products from a vector store, rather than stuffing the whole catalog into the prompt (see [RAG Pipeline](DOCUMENTATION.md#rag-pipeline))
+- Can recommend, compare, and answer questions grounded in retrieved products
 - Rich product cards rendered inline when the AI references a product
 
 ### Smart Cart Suggestions
@@ -67,7 +69,8 @@ PulseCart AI is a smart e-commerce prototype that demonstrates how AI can enhanc
 | **Styling** | Vanilla CSS + CSS Modules, glassmorphism, micro-animations |
 | **Fonts** | Saira Stencil One, Montserrat, Nunito (Google Fonts) |
 | **AI Model** | LLaMA 3.1 8B Instant via Groq SDK |
-| **Data** | Static JSON product catalog |
+| **Embeddings / RAG** | Xenova/all-MiniLM-L6-v2 via `@xenova/transformers` (local, no API key) — see [RAG Pipeline](DOCUMENTATION.md#rag-pipeline) |
+| **Data** | Static JSON product catalog + precomputed vector store (`data/embeddings.json`) |
 | **Analytics** | Vercel Analytics |
 | **Deployment** | Vercel |
 
@@ -93,8 +96,14 @@ PulseCartAI/
 │       ├── NudgeEngine.js           # Rule-based nudge triggers
 │       ├── NudgeToast.js            # Toast notification for nudges
 │       └── NudgeToast.module.css
+├── lib/
+│   ├── embeddings.js                # Local embedding model wrapper (Xenova/all-MiniLM-L6-v2)
+│   └── retrieval.js                 # RAG retrieval — cosine similarity search over the vector store
+├── scripts/
+│   └── build-embeddings.mjs         # Ingestion script — builds data/embeddings.json
 ├── data/
-│   └── products.json                # Product catalog (45 items)
+│   ├── products.json                # Product catalog (45 items)
+│   └── embeddings.json              # Precomputed vector store (run `npm run embed` to rebuild)
 ├── package.json
 └── vercel.json
 ```
@@ -114,6 +123,12 @@ Set up your environment variables:
 ```bash
 # Create a .env.local file with your Groq API key
 GROQ_API_KEY=your_groq_api_key_here
+```
+
+Build the vector store (one-time, or whenever `data/products.json` changes):
+
+```bash
+npm run embed
 ```
 
 Run the development server:
