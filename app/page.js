@@ -2,7 +2,7 @@
 import { useState, useCallback, useEffect, useRef } from "react";
 import products from "@/data/products.json";
 import {
-  PulseCartLogo, SearchIcon, CartIcon, UserIcon,
+  SearchIcon, CartIcon, UserIcon,
   HeartIcon, StarIcon, PlusIcon, MinusIcon, CloseIcon,
   ChevronRightIcon, ImageIcon, ShoppingBagIcon,
   HeadphonesIcon, WatchIcon, LaptopIcon, CameraIcon, KeyboardIcon,
@@ -604,9 +604,9 @@ export default function Home() {
       <nav className="navbar" role="navigation" aria-label="Main navigation">
         <div className="navbar-inner">
 
-          {/* Logo: pulse waveform SVG + Saira Stencil word */}
+          {/* Logo: brand mark + Saira Stencil word */}
           <div className="logo" aria-label="PulseCart home">
-            <PulseCartLogo size={36} />
+            <img src="/logos/logo.png" alt="PulseCart logo" className="logo-mark" />
             <span className="logo-text">PulseCart</span>
           </div>
 

@@ -1,24 +1,5 @@
 /* SVG Icon components — no emojis, clean line icons */
 
-export function PulseCartLogo({ size = 36 }) {
-  return (
-    <svg width={size * 1.8} height={size * 0.7} viewBox="0 0 90 35" fill="none" aria-label="PulseCart logo">
-      {/* ECG / Pulse waveform */}
-      <polyline
-        points="0,17 14,17 19,4 26,30 33,4 40,30 45,17 62,17"
-        stroke="#e31c1c" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"
-      />
-      {/* Cart body */}
-      <path d="M67 10 L84 10 L81 23 L70 23 Z" stroke="#e31c1c" strokeWidth="2.2" fill="none" strokeLinejoin="round" />
-      {/* Cart wheels */}
-      <circle cx="72" cy="27" r="2" fill="#e31c1c" />
-      <circle cx="80" cy="27" r="2" fill="#e31c1c" />
-      {/* Cart handle */}
-      <path d="M63 7 L67 7 L67 10" stroke="#e31c1c" strokeWidth="2.2" strokeLinecap="round" />
-    </svg>
-  );
-}
-
 export function SearchIcon({ size = 18 }) {
   return (
     <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">

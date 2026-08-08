@@ -108,9 +108,11 @@ button {
   cursor: pointer;
 }
 
-.logo-pulse-svg {
-  display: flex;
-  align-items: center;
+.logo-mark {
+  width: 36px;
+  height: 36px;
+  display: block;
+  object-fit: contain;
 }
 
 .logo-text {
