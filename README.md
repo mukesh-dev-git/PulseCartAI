@@ -6,6 +6,32 @@ PulseCart AI is a smart e-commerce prototype that demonstrates how AI can enhanc
 
 ---
 
+## Screenshots
+
+Captured from a local run.
+
+**Storefront**
+
+![Storefront](docs/screenshots/storefront.png)
+
+**AI smart search ("best laptop for coding")**
+
+![AI smart search ("best laptop for coding")](docs/screenshots/ai-search.png)
+
+**Product detail with AI quick verdict**
+
+![Product detail with AI quick verdict](docs/screenshots/product-ai-verdict.png)
+
+**Cart with "Complete Your Setup" suggestions and a nudge**
+
+![Cart with "Complete Your Setup" suggestions and a nudge](docs/screenshots/cart-ai-suggestions.png)
+
+**AI shopping assistant (RAG-grounded chat)**
+
+![AI shopping assistant (RAG-grounded chat)](docs/screenshots/ai-chat.png)
+
+---
+
 ## Features
 
 ### Product Catalog & Browsing
@@ -40,7 +66,7 @@ PulseCart AI is a smart e-commerce prototype that demonstrates how AI can enhanc
 - **Fully responsive** — takes full screen on mobile with touch-friendly layout
 
 ### AI Shopping Assistant
-- Floating chat widget powered by **LLaMA 3.1** (via Groq)
+- Floating chat widget powered by **gpt-oss-20b** (via Groq)
 - Streaming responses for real-time conversation feel
 - **RAG-grounded** — each message is embedded and used to retrieve the top-6 relevant products from a vector store, rather than stuffing the whole catalog into the prompt (see [RAG Pipeline](DOCUMENTATION.md#rag-pipeline))
 - Can recommend, compare, and answer questions grounded in retrieved products
@@ -68,7 +94,7 @@ PulseCart AI is a smart e-commerce prototype that demonstrates how AI can enhanc
 | **UI** | React 19, Client Components |
 | **Styling** | Vanilla CSS + CSS Modules, glassmorphism, micro-animations |
 | **Fonts** | Saira Stencil One, Montserrat, Nunito (Google Fonts) |
-| **AI Model** | LLaMA 3.1 8B Instant via Groq SDK |
+| **AI Model** | gpt-oss-20b via Groq SDK |
 | **Embeddings / RAG** | Xenova/all-MiniLM-L6-v2 via `@xenova/transformers` (local, no API key) — see [RAG Pipeline](DOCUMENTATION.md#rag-pipeline) |
 | **Data** | Static JSON product catalog + precomputed vector store (`data/embeddings.json`) |
 | **Analytics** | Vercel Analytics |
@@ -145,7 +171,7 @@ Open [http://localhost:3000](http://localhost:3000) to see the app.
 
 | Method | Endpoint | Description |
 |---|---|---|
-| POST | `/api/chat` | Sends conversation to Groq LLaMA 3.1 and streams the response back |
+| POST | `/api/chat` | Sends conversation to Groq gpt-oss-20b and streams the response back |
 | POST | `/api/search` | AI-powered product search — returns ranked product IDs with match reasons |
 | POST | `/api/suggest` | Cart-based AI suggestions — returns complementary product recommendations |
 | POST | `/api/verdict` | AI product verdict — returns pros, cons, best-for, and recommendation |
