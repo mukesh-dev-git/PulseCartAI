@@ -1,6 +1,6 @@
 <div align="center">
 
-<img src="https://capsule-render.vercel.app/api?type=cylinder&color=0:C2410C,100:FB923C&height=200&section=header&text=PulseCart%20AI&fontSize=54&fontColor=ffffff&animation=scaleIn&fontAlignY=38&desc=Real-time%20intent.%20Instant%20personalization.&descAlignY=60&descSize=18" width="100%" alt="PulseCart AI banner"/>
+<img src="docs/header.svg" width="100%" alt="PulseCart AI banner"/>
 
 <a href="#screenshots"><img src="https://readme-typing-svg.demolab.com?font=Fira+Code&weight=600&size=20&pause=1200&color=FB923C&center=true&vCenter=true&width=760&lines=An+AI+shopping+assistant+grounded+in+the+catalog;Natural-language+search+with+a+reason+for+every+result;Cart+suggestions%2C+product+verdicts+and+smart+nudges;RAG+over+a+local+vector+store+%C2%B7+no+embedding+API+key" alt="Typing summary"/></a>
 
@@ -142,6 +142,6 @@ MIT
 
 <div align="center">
 
-<img src="https://capsule-render.vercel.app/api?type=soft&color=0:FB923C,100:C2410C&height=110&section=footer&animation=blinking" width="100%" alt=""/>
+<img src="docs/footer.svg" width="100%" alt=""/>
 
 </div>

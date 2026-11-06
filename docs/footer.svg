@@ -1,0 +1,34 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1000" height="190" viewBox="0 0 1000 190" role="img" aria-label="decorative footer">
+  <defs>
+    <filter id="soft" filterUnits="userSpaceOnUse" x="-300" y="-300" width="1600" height="790">
+      <feGaussianBlur stdDeviation="30"/>
+    </filter>
+    <style>
+      .t { font: 700 52px 'Segoe UI', Helvetica, Arial, sans-serif; fill: #1f2937; letter-spacing: 0.5px; }
+      .s { font: 500 18px 'Segoe UI', Helvetica, Arial, sans-serif; fill: #4b5563; }
+      @media (prefers-color-scheme: dark) { .t { fill: #ffffff; } .s { fill: #d1d5db; } }
+    </style>
+  </defs>
+  <g filter="url(#soft)">
+    <ellipse cx="140" cy="190" rx="288" ry="70" fill="#F2A07B" opacity="0.95">
+      <animate attributeName="cx" values="140;430;220;140" keyTimes="0;0.34;0.67;1" calcMode="spline" keySplines="0.45 0 0.55 1;0.45 0 0.55 1;0.45 0 0.55 1" dur="16s" begin="0s" repeatCount="indefinite"/>
+      <animate attributeName="ry" values="70;95;55;70" keyTimes="0;0.34;0.67;1" calcMode="spline" keySplines="0.45 0 0.55 1;0.45 0 0.55 1;0.45 0 0.55 1" dur="12.8s" begin="0s" repeatCount="indefinite"/>
+    </ellipse>
+    <ellipse cx="640" cy="190" rx="250" ry="80" fill="#F062B5" opacity="0.95">
+      <animate attributeName="cx" values="640;860;520;640" keyTimes="0;0.34;0.67;1" calcMode="spline" keySplines="0.45 0 0.55 1;0.45 0 0.55 1;0.45 0 0.55 1" dur="13s" begin="-4s" repeatCount="indefinite"/>
+      <animate attributeName="ry" values="80;55;100;80" keyTimes="0;0.34;0.67;1" calcMode="spline" keySplines="0.45 0 0.55 1;0.45 0 0.55 1;0.45 0 0.55 1" dur="10.4s" begin="-4s" repeatCount="indefinite"/>
+    </ellipse>
+    <ellipse cx="420" cy="190" rx="213" ry="45" fill="#F2D67F" opacity="0.95">
+      <animate attributeName="cx" values="420;250;600;420" keyTimes="0;0.34;0.67;1" calcMode="spline" keySplines="0.45 0 0.55 1;0.45 0 0.55 1;0.45 0 0.55 1" dur="18s" begin="-7s" repeatCount="indefinite"/>
+      <animate attributeName="ry" values="45;70;30;45" keyTimes="0;0.34;0.67;1" calcMode="spline" keySplines="0.45 0 0.55 1;0.45 0 0.55 1;0.45 0 0.55 1" dur="14.4s" begin="-7s" repeatCount="indefinite"/>
+    </ellipse>
+    <ellipse cx="60" cy="190" rx="275" ry="55" fill="#F9C9D4" opacity="0.95">
+      <animate attributeName="cx" values="60;300;120;60" keyTimes="0;0.34;0.67;1" calcMode="spline" keySplines="0.45 0 0.55 1;0.45 0 0.55 1;0.45 0 0.55 1" dur="20s" begin="-2s" repeatCount="indefinite"/>
+      <animate attributeName="ry" values="55;75;45;55" keyTimes="0;0.34;0.67;1" calcMode="spline" keySplines="0.45 0 0.55 1;0.45 0 0.55 1;0.45 0 0.55 1" dur="16s" begin="-2s" repeatCount="indefinite"/>
+    </ellipse>
+    <ellipse cx="930" cy="190" rx="188" ry="35" fill="#F2A07B" opacity="0.95">
+      <animate attributeName="cx" values="930;700;880;930" keyTimes="0;0.34;0.67;1" calcMode="spline" keySplines="0.45 0 0.55 1;0.45 0 0.55 1;0.45 0 0.55 1" dur="15s" begin="-9s" repeatCount="indefinite"/>
+      <animate attributeName="ry" values="35;65;25;35" keyTimes="0;0.34;0.67;1" calcMode="spline" keySplines="0.45 0 0.55 1;0.45 0 0.55 1;0.45 0 0.55 1" dur="12s" begin="-9s" repeatCount="indefinite"/>
+    </ellipse>
+  </g>
+</svg>
