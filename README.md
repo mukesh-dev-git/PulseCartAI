@@ -9,7 +9,7 @@ PulseCart AI is a smart e-commerce prototype that demonstrates how AI can enhanc
 ## Features
 
 ### Product Catalog & Browsing
-- Dynamic product grid with 30+ items across multiple categories
+- Dynamic product grid with 45 items across multiple categories
 - Category tab filtering (Headphones, Smartwatches, Laptops, Cameras, Keyboards)
 - Real-time client-side search
 - Product badges (Best Seller, Top Rated, New Arrival, Pro Pick)
@@ -72,7 +72,7 @@ PulseCart AI is a smart e-commerce prototype that demonstrates how AI can enhanc
 | **Embeddings / RAG** | Xenova/all-MiniLM-L6-v2 via `@xenova/transformers` (local, no API key) — see [RAG Pipeline](DOCUMENTATION.md#rag-pipeline) |
 | **Data** | Static JSON product catalog + precomputed vector store (`data/embeddings.json`) |
 | **Analytics** | Vercel Analytics |
-| **Deployment** | Vercel |
+| **Deployment** | Vercel (taken down; runs locally) |
 
 ---
 
