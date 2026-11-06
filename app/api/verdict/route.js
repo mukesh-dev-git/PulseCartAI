@@ -43,13 +43,14 @@ Features: ${product.features?.join(", ")}
 Stock: ${product.stockCount} units`;
 
     const response = await groq.chat.completions.create({
-      model: "llama-3.1-8b-instant",
+      model: "openai/gpt-oss-20b",
       messages: [
         { role: "system", content: systemPrompt },
         { role: "user", content: productInfo },
       ],
       temperature: 0.3,
-      max_tokens: 300,
+      max_tokens: 1500,
+      reasoning_effort: "low",
       response_format: { type: "json_object" },
     });
 

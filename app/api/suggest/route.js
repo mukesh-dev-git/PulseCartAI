@@ -41,13 +41,14 @@ RULES:
 {"suggestions":[{"id":1,"reason":"Perfect companion for your laptop"}]}`;
 
     const response = await groq.chat.completions.create({
-      model: "llama-3.1-8b-instant",
+      model: "openai/gpt-oss-20b",
       messages: [
         { role: "system", content: systemPrompt },
         { role: "user", content: "What should I add to complete my setup?" },
       ],
       temperature: 0.4,
-      max_tokens: 300,
+      max_tokens: 1500,
+      reasoning_effort: "low",
       response_format: { type: "json_object" },
     });
 

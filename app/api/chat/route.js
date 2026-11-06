@@ -45,10 +45,11 @@ ${catalog}`;
 
     // Request stream from Groq
     const stream = await groq.chat.completions.create({
-      model: "llama-3.1-8b-instant",
+      model: "openai/gpt-oss-20b",
       messages: chatMessages,
       temperature: 0.7,
-      max_tokens: 512,
+      max_tokens: 2048,
+      reasoning_effort: "low",
       stream: true,
     });
 

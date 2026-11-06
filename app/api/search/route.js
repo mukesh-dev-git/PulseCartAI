@@ -47,13 +47,14 @@ STRICT RULES:
 Example: {"summary":"Found 3 laptops under RM3000","results":[{"id":5,"reason":"Affordable at RM2499 with great specs for coding"},{"id":12,"reason":"Budget-friendly at RM1899 with 16GB RAM"}]}`;
 
     const response = await groq.chat.completions.create({
-      model: "llama-3.1-8b-instant",
+      model: "openai/gpt-oss-20b",
       messages: [
         { role: "system", content: systemPrompt },
         { role: "user", content: query },
       ],
       temperature: 0.2,
-      max_tokens: 600,
+      max_tokens: 2048,
+      reasoning_effort: "low",
       response_format: { type: "json_object" },
     });
 
