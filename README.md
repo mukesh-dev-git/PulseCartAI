@@ -1,183 +1,147 @@
-# PulseCart AI
+<div align="center">
 
-**Real-time intent. Instant personalization.**
+<img src="https://capsule-render.vercel.app/api?type=cylinder&color=0:C2410C,100:FB923C&height=200&section=header&text=PulseCart%20AI&fontSize=54&fontColor=ffffff&animation=scaleIn&fontAlignY=38&desc=Real-time%20intent.%20Instant%20personalization.&descAlignY=60&descSize=18" width="100%" alt="PulseCart AI banner"/>
 
-PulseCart AI is a smart e-commerce prototype that demonstrates how AI can enhance the online shopping experience. It combines a modern storefront UI with an AI-powered assistant and intelligent nudge system to increase engagement and conversions.
+<a href="#screenshots"><img src="https://readme-typing-svg.demolab.com?font=Fira+Code&weight=600&size=20&pause=1200&color=FB923C&center=true&vCenter=true&width=760&lines=An+AI+shopping+assistant+grounded+in+the+catalog;Natural-language+search+with+a+reason+for+every+result;Cart+suggestions%2C+product+verdicts+and+smart+nudges;RAG+over+a+local+vector+store+%C2%B7+no+embedding+API+key" alt="Typing summary"/></a>
+
+<br/>
+
+[![Next.js](https://img.shields.io/badge/Next.js-16-000000?logo=nextdotjs&logoColor=white)](https://nextjs.org)
+[![React](https://img.shields.io/badge/React-19-61DAFB?logo=react&logoColor=black)](https://react.dev)
+[![Groq](https://img.shields.io/badge/LLM-Groq%20gpt--oss--20b-F55036)](https://groq.com)
+[![Transformers.js](https://img.shields.io/badge/Embeddings-MiniLM--L6--v2-FFD21E?logo=huggingface&logoColor=black)](https://huggingface.co/Xenova/all-MiniLM-L6-v2)
+[![License](https://img.shields.io/badge/License-MIT-blue)](#license)
+
+</div>
 
 ---
 
-## Screenshots
+## <img src="https://api.iconify.design/lucide/target.svg?color=%23EA580C" width="26" align="top" alt=""/> Project Overview
 
-Captured from a local run.
+PulseCart AI is an e-commerce prototype that shows how AI can sit inside the shopping experience instead of beside it. A modern storefront is paired with an assistant that knows the catalog, a search box that understands intent, and a nudge engine that reacts to what the shopper is doing.
+
+The assistant never has the whole catalog pasted into its prompt. Each question is embedded, matched against a local vector store, and only the closest products are handed to the model, so answers stay grounded in real items and prices.
+
+### Key Features
+
+- <img src="https://api.iconify.design/lucide/search.svg?color=%230EA5E9" width="18" align="top" alt=""/> **AI smart search**: queries like "best laptop for coding" or "gift under RM200" return ranked products, each with a one-line reason.
+- <img src="https://api.iconify.design/lucide/message-circle.svg?color=%238B5CF6" width="18" align="top" alt=""/> **Shopping assistant**: a streaming chat widget that recommends and compares products, with product cards shown inline.
+- <img src="https://api.iconify.design/lucide/scale.svg?color=%2310B981" width="18" align="top" alt=""/> **AI quick verdict**: every product page gets generated pros, cons, a best-for line and a recommendation.
+- <img src="https://api.iconify.design/lucide/shopping-cart.svg?color=%23F59E0B" width="18" align="top" alt=""/> **Smart cart suggestions**: "Complete Your Setup" proposes two or three complementary products with a short reason.
+- <img src="https://api.iconify.design/lucide/bell-ring.svg?color=%23EF4444" width="18" align="top" alt=""/> **Nudge engine**: detects hesitation on a product, low stock on wishlist items and abandoned carts, and offers an "Ask AI about this" shortcut.
+- <img src="https://api.iconify.design/lucide/store.svg?color=%2364748B" width="18" align="top" alt=""/> **Storefront basics**: 45 products in five categories, category filters, wishlist, cart drawer and free delivery above RM265.
+
+## <img src="https://api.iconify.design/lucide/image.svg?color=%23EA580C" width="26" align="top" alt=""/> Screenshots
 
 **Storefront**
 
 ![Storefront](docs/screenshots/storefront.png)
 
-**AI smart search ("best laptop for coding")**
+**AI smart search**
 
-![AI smart search ("best laptop for coding")](docs/screenshots/ai-search.png)
+![AI smart search](docs/screenshots/ai-search.png)
 
 **Product detail with AI quick verdict**
 
 ![Product detail with AI quick verdict](docs/screenshots/product-ai-verdict.png)
 
-**Cart with "Complete Your Setup" suggestions and a nudge**
+**Cart with suggestions**
 
-![Cart with "Complete Your Setup" suggestions and a nudge](docs/screenshots/cart-ai-suggestions.png)
+![Cart with suggestions](docs/screenshots/cart-ai-suggestions.png)
 
-**AI shopping assistant (RAG-grounded chat)**
+**AI shopping assistant**
 
-![AI shopping assistant (RAG-grounded chat)](docs/screenshots/ai-chat.png)
+![AI shopping assistant](docs/screenshots/ai-chat.png)
 
----
+## <img src="https://api.iconify.design/lucide/clipboard-list.svg?color=%23EA580C" width="26" align="top" alt=""/> Requirements
 
-## Features
+- Node.js 20 or newer
+- A free [Groq API key](https://console.groq.com)
 
-### Product Catalog & Browsing
-- Dynamic product grid with 45 items across multiple categories
-- Category tab filtering (Headphones, Smartwatches, Laptops, Cameras, Keyboards)
-- Real-time client-side search
-- Product badges (Best Seller, Top Rated, New Arrival, Pro Pick)
-- Stock status indicators and discount highlights
+## <img src="https://api.iconify.design/lucide/zap.svg?color=%23EA580C" width="26" align="top" alt=""/> Quick Start
 
-### Shopping Cart
-- Slide-out cart drawer with real-time quantity controls
-- Subtotal, delivery fee calculation (free delivery above RM265), and total
-- Toast notifications for add/remove actions
+```bash
+git clone https://github.com/mukesh-dev-git/PulseCartAI.git
+cd PulseCartAI
+npm install
 
-### Wishlist
-- Save favourite products to a dedicated wishlist drawer
-- Quick "Move to Cart" action from wishlist
+# Add your Groq key
+echo "GROQ_API_KEY=your_key_here" > .env.local
 
-### AI Smart Search
-- Type a natural language query and press **Enter** (or click the sparkle button) to trigger AI-powered search
-- **Retrieval-Augmented**: query is embedded and matched against a vector store of the catalog before the LLM ranks and explains the shortlist (see [RAG Pipeline](DOCUMENTATION.md#rag-pipeline))
-- Understands intent — queries like *"best laptop for coding"*, *"gift under RM200"*, or *"wireless headphones for gym"* all work
-- Returns ranked results with a per-product **AI reason chip** explaining why each product matches
-- Results banner shows a summary of what the AI found, with a clear button to reset
-- Falls back to instant text filtering while typing (AI triggers only on Enter)
+# Build the vector store (only needed again if data/products.json changes)
+npm run embed
 
-### Product Detail Page
-- Tap/click any product card to open a full detail modal
-- Shows all product info: image, price, discount, rating, description, features, stock status
-- **AI Quick Verdict** — auto-generated pros, cons, best-for summary, and final recommendation
-- Sticky bottom bar with Wishlist, **Ask AI**, and Add to Cart buttons
-- **Fully responsive** — takes full screen on mobile with touch-friendly layout
+npm run dev
+```
 
-### AI Shopping Assistant
-- Floating chat widget powered by **gpt-oss-20b** (via Groq)
-- Streaming responses for real-time conversation feel
-- **RAG-grounded** — each message is embedded and used to retrieve the top-6 relevant products from a vector store, rather than stuffing the whole catalog into the prompt (see [RAG Pipeline](DOCUMENTATION.md#rag-pipeline))
-- Can recommend, compare, and answer questions grounded in retrieved products
-- Rich product cards rendered inline when the AI references a product
+Open http://localhost:3000.
 
-### Smart Cart Suggestions
-- When items are in the cart, AI analyzes what's there and suggests **2-3 complementary products** ("Complete Your Setup")
-- Each suggestion includes a short reason (e.g., *"Perfect companion for your laptop"*) and a quick **Add** button
-- Fetches fresh suggestions whenever the cart contents change
-- Displayed in a warm-styled section inside the cart drawer with loading state
+## <img src="https://api.iconify.design/lucide/network.svg?color=%23EA580C" width="26" align="top" alt=""/> How It Works
 
-### Smart Nudge Engine
-- **Hesitation Detection** — Detects when a user hovers on a product for 3+ seconds and surfaces an AI insight nudge with an **"Ask AI about this"** button that opens the chatbot with a pre-filled prompt about that product
-- **Low Stock Urgency** — Alerts when a wishlisted item is running low on stock
-- **Cart Recovery** — Reminds users about abandoned cart items after 30 seconds of inactivity
-- Auto-dismissing toast notifications with type-specific styling and animations
+```mermaid
+flowchart TD
+    A[Shopper<br/>search · chat · cart · product page] --> B[Next.js API routes]
+    B --> C[Embed the query<br/>MiniLM-L6-v2, runs locally]
+    C --> D[Cosine search<br/>data/embeddings.json]
+    D --> E[Top matching products]
+    E --> F[Groq gpt-oss-20b<br/>ranks, explains, writes the verdict]
+    F --> G[Ranked results · streamed chat · suggestions · verdicts]
+    A --> H[Nudge engine<br/>hover time · stock · idle cart]
+    H --> A
 
----
+    classDef ui fill:#FFEDD5,stroke:#EA580C,color:#222
+    classDef core fill:#F1EFE8,stroke:#888780,color:#222
+    classDef ai fill:#EEEDFE,stroke:#7F77DD,color:#222
+    class A,H,G ui
+    class B,C,D,E core
+    class F ai
+```
 
-## Tech Stack
+### API
 
-| Layer | Technology |
-|---|---|
-| **Framework** | Next.js 16 (App Router) |
-| **UI** | React 19, Client Components |
-| **Styling** | Vanilla CSS + CSS Modules, glassmorphism, micro-animations |
-| **Fonts** | Saira Stencil One, Montserrat, Nunito (Google Fonts) |
-| **AI Model** | gpt-oss-20b via Groq SDK |
-| **Embeddings / RAG** | Xenova/all-MiniLM-L6-v2 via `@xenova/transformers` (local, no API key) — see [RAG Pipeline](DOCUMENTATION.md#rag-pipeline) |
-| **Data** | Static JSON product catalog + precomputed vector store (`data/embeddings.json`) |
-| **Analytics** | Vercel Analytics |
-| **Deployment** | Vercel (taken down; runs locally) |
+| Method | Endpoint | Description |
+|---|---|---|
+| POST | `/api/chat` | Streams the assistant's reply to a conversation |
+| POST | `/api/search` | Ranked product ids with a reason for each match |
+| POST | `/api/suggest` | Complementary products for the current cart |
+| POST | `/api/verdict` | Pros, cons, best-for and recommendation for one product |
 
----
-
-## Project Structure
+## <img src="https://api.iconify.design/lucide/folder-tree.svg?color=%23EA580C" width="26" align="top" alt=""/> Project Structure
 
 ```
 PulseCartAI/
 ├── app/
-│   ├── layout.js                    # Root layout, fonts, analytics
-│   ├── page.js                      # Main storefront page
-│   ├── globals.css                  # Global styles
-│   ├── api/
-│   │   ├── chat/route.js            # POST /api/chat — Groq streaming endpoint
-│   │   ├── search/route.js          # POST /api/search — AI smart search endpoint
-│   │   ├── suggest/route.js         # POST /api/suggest — Cart suggestion endpoint
-│   │   └── verdict/route.js         # POST /api/verdict — AI product verdict
-│   └── components/
-│       ├── AIChatWidget.js          # Floating AI chat panel
-│       ├── AIChatWidget.module.css
-│       ├── Icons.js                 # SVG icon components
-│       ├── NudgeEngine.js           # Rule-based nudge triggers
-│       ├── NudgeToast.js            # Toast notification for nudges
-│       └── NudgeToast.module.css
+│   ├── page.js                # storefront
+│   ├── api/                   # chat, search, suggest, verdict routes
+│   └── components/            # chat widget, nudge engine, toasts, icons
 ├── lib/
-│   ├── embeddings.js                # Local embedding model wrapper (Xenova/all-MiniLM-L6-v2)
-│   └── retrieval.js                 # RAG retrieval — cosine similarity search over the vector store
-├── scripts/
-│   └── build-embeddings.mjs         # Ingestion script — builds data/embeddings.json
+│   ├── embeddings.js          # local embedding model wrapper
+│   └── retrieval.js           # cosine search over the vector store
+├── scripts/build-embeddings.mjs
 ├── data/
-│   ├── products.json                # Product catalog (45 items)
-│   └── embeddings.json              # Precomputed vector store (run `npm run embed` to rebuild)
-├── package.json
-└── vercel.json
+│   ├── products.json          # catalog, 45 items
+│   └── embeddings.json        # precomputed vectors
+├── docs/screenshots/
+├── DOCUMENTATION.md           # deeper write-up
+└── PLAN.md
 ```
 
----
+## <img src="https://api.iconify.design/lucide/cloud.svg?color=%23EA580C" width="26" align="top" alt=""/> Deployment
 
-## Getting Started
+The app deploys to Vercel as a standard Next.js project with `GROQ_API_KEY` set as an environment variable. The original Vercel deployment has been taken down, so it runs locally for now.
 
-Install dependencies:
-
-```bash
-npm install
-```
-
-Set up your environment variables:
-
-```bash
-# Create a .env.local file with your Groq API key
-GROQ_API_KEY=your_groq_api_key_here
-```
-
-Build the vector store (one-time, or whenever `data/products.json` changes):
-
-```bash
-npm run embed
-```
-
-Run the development server:
-
-```bash
-npm run dev
-```
-
-Open [http://localhost:3000](http://localhost:3000) to see the app.
-
----
-
-## API
-
-| Method | Endpoint | Description |
-|---|---|---|
-| POST | `/api/chat` | Sends conversation to Groq gpt-oss-20b and streams the response back |
-| POST | `/api/search` | AI-powered product search — returns ranked product IDs with match reasons |
-| POST | `/api/suggest` | Cart-based AI suggestions — returns complementary product recommendations |
-| POST | `/api/verdict` | AI product verdict — returns pros, cons, best-for, and recommendation |
-
----
-
-## License
+## <img src="https://api.iconify.design/lucide/scale.svg?color=%23EA580C" width="26" align="top" alt=""/> License
 
 MIT
+
+## <img src="https://api.iconify.design/lucide/heart-handshake.svg?color=%23EA580C" width="26" align="top" alt=""/> Acknowledgments
+
+- [Groq](https://groq.com) for fast inference
+- [Transformers.js](https://huggingface.co/docs/transformers.js) and the `Xenova/all-MiniLM-L6-v2` model for local embeddings
+- Built with Next.js and React
+
+<div align="center">
+
+<img src="https://capsule-render.vercel.app/api?type=soft&color=0:FB923C,100:C2410C&height=110&section=footer&animation=blinking" width="100%" alt=""/>
+
+</div>
